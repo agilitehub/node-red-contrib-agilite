@@ -1,0 +1,137 @@
+[
+  {
+      "id": "fd8d8f67.a017",
+      "type": "comment",
+      "z": "74fd2ead.467bb",
+      "name": "Batch Actions test case flow",
+      "info": "",
+      "x": 160,
+      "y": 3840,
+      "wires": []
+  },
+  {
+      "id": "bf4bb163.29813",
+      "type": "inject",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "topic": "",
+      "payload": "",
+      "payloadType": "date",
+      "repeat": "",
+      "crontab": "",
+      "once": false,
+      "onceDelay": 0.1,
+      "x": 120,
+      "y": 3880,
+      "wires": [
+          [
+              "fcbbe531.0416a8"
+          ]
+      ]
+  },
+  {
+      "id": "db700f33.90b0e",
+      "type": "comment",
+      "z": "74fd2ead.467bb",
+      "name": "Execute",
+      "info": "",
+      "x": 160,
+      "y": 3960,
+      "wires": []
+  },
+  {
+      "id": "fcbbe531.0416a8",
+      "type": "function",
+      "z": "74fd2ead.467bb",
+      "name": "Prep Data Object",
+      "func": "var key = null;\n\n// Set Key\nflow.set(\"batchactions.key\", \"node-red-testing\");\nkey = flow.get(\"batchactions.key\");\n\n// Test if key is null\nif(key !== null){\n    node.warn(\"key is not equal to null\");\n}else{\n    node.error(\"key is equal to null\");\n}\n\nmsg.key = key;\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 190,
+      "y": 3920,
+      "wires": [
+          [
+              "c5a5355c.6f2578",
+              "3d460776.313038"
+          ]
+      ]
+  },
+  {
+      "id": "17f54a61.657226",
+      "type": "type-detect",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "field": "payload",
+      "fieldType": "msg",
+      "x": 330,
+      "y": 3980,
+      "wires": [
+          [
+              "30a2d5b8.a77baa"
+          ]
+      ]
+  },
+  {
+      "id": "30a2d5b8.a77baa",
+      "type": "function",
+      "z": "74fd2ead.467bb",
+      "name": "Test Result Type",
+      "func": "if(msg.payload === \"object\"){\n    node.warn(\"Response is a Object\");\n}else{\n    node.error(\"Response is not a Object\");\n}\n\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 500,
+      "y": 3980,
+      "wires": [
+          []
+      ]
+  },
+  {
+      "id": "330a7629.88ea3a",
+      "type": "function",
+      "z": "74fd2ead.467bb",
+      "name": "Test Result",
+      "func": "var resultObject = {\n    \"result\": \"Greetings from Agilit-e\"\n}\n\nif(msg.payload === resultObject){\n    node.warn(\"Result is Correct\");\n}else{\n    node.error(\"Result is Incorrect\");\n}\n\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 330,
+      "y": 4020,
+      "wires": [
+          []
+      ]
+  },
+  {
+      "id": "c5a5355c.6f2578",
+      "type": "batch-actions",
+      "z": "74fd2ead.467bb",
+      "server": "8c83b301.9e6b7",
+      "profileKey": "{{key}}",
+      "name": "",
+      "field": "payload",
+      "fieldType": "msg",
+      "failFlow": true,
+      "x": 160,
+      "y": 4000,
+      "wires": [
+          [
+              "17f54a61.657226",
+              "330a7629.88ea3a",
+              "3d460776.313038"
+          ]
+      ]
+  },
+  {
+      "id": "3d460776.313038",
+      "type": "debug",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "active": true,
+      "tosidebar": true,
+      "console": false,
+      "tostatus": false,
+      "complete": "true",
+      "targetType": "full",
+      "x": 380,
+      "y": 4140,
+      "wires": []
+  }
+]

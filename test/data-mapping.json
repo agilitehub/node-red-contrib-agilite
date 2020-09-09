@@ -1,0 +1,269 @@
+[
+    {
+        "id": "f4a51f09.410b5",
+        "type": "comment",
+        "z": "74fd2ead.467bb",
+        "name": "Data Mapping test case flow",
+        "info": "",
+        "x": 160,
+        "y": 1340,
+        "wires": []
+    },
+    {
+        "id": "c001521d.34c51",
+        "type": "data-mapping",
+        "z": "74fd2ead.467bb",
+        "server": "8c83b301.9e6b7",
+        "profileKey": "{{key}}",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "failFlow": true,
+        "x": 160,
+        "y": 1500,
+        "wires": [
+            [
+                "4d80c74b.beffd8"
+            ]
+        ]
+    },
+    {
+        "id": "d6d25bc5.154708",
+        "type": "inject",
+        "z": "74fd2ead.467bb",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 120,
+        "y": 1380,
+        "wires": [
+            [
+                "4740b47e.61e79c"
+            ]
+        ]
+    },
+    {
+        "id": "af464773.7b4598",
+        "type": "comment",
+        "z": "74fd2ead.467bb",
+        "name": "Execute",
+        "info": "",
+        "x": 160,
+        "y": 1460,
+        "wires": []
+    },
+    {
+        "id": "4740b47e.61e79c",
+        "type": "function",
+        "z": "74fd2ead.467bb",
+        "name": "Prep Data Object",
+        "func": "var key = null;\n\n// Set Key\nflow.set(\"datamappings.key\", \"node-red-testing\");\nkey = flow.get(\"datamappings.key\");\n\n// Test if key is null\nif(key !== null){\n    node.warn(\"key is not equal to null\");\n}else{\n    node.error(\"key is equal to null\");\n}\n\nmsg.key = key;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 190,
+        "y": 1420,
+        "wires": [
+            [
+                "c001521d.34c51"
+            ]
+        ]
+    },
+    {
+        "id": "4d80c74b.beffd8",
+        "type": "type-detect",
+        "z": "74fd2ead.467bb",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "x": 330,
+        "y": 1500,
+        "wires": [
+            [
+                "dd01ebaf.a639e8"
+            ]
+        ]
+    },
+    {
+        "id": "dd01ebaf.a639e8",
+        "type": "function",
+        "z": "74fd2ead.467bb",
+        "name": "Test Result Type",
+        "func": "if(msg.payload === \"Object\"){\n    node.warn(\"Response is a Object\");\n}else{\n    node.error(\"Response is not a Object\");\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 500,
+        "y": 1500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "823e21b.fb4bee",
+        "type": "inject",
+        "z": "74fd2ead.467bb",
+        "name": "",
+        "topic": "",
+        "payload": "{\"data\":[{\"prop1\":\"prop1\",\"prop2\":\"prop2\",\"prop3\":\"prop3\"}]}",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 110,
+        "y": 1580,
+        "wires": [
+            [
+                "dbd95d4a.566fd"
+            ]
+        ]
+    },
+    {
+        "id": "dbd95d4a.566fd",
+        "type": "data-mapping",
+        "z": "74fd2ead.467bb",
+        "server": "8c83b301.9e6b7",
+        "profileKey": "testing_profile",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "failFlow": true,
+        "x": 300,
+        "y": 1580,
+        "wires": [
+            [
+                "a41588f0.3aa758"
+            ]
+        ]
+    },
+    {
+        "id": "a41588f0.3aa758",
+        "type": "debug",
+        "z": "74fd2ead.467bb",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 500,
+        "y": 1580,
+        "wires": []
+    },
+    {
+        "id": "e082bb3e.bc1fe8",
+        "type": "inject",
+        "z": "74fd2ead.467bb",
+        "name": "",
+        "topic": "",
+        "payload": "{\"data\":[\"test1\",\"test2\"]}",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 110,
+        "y": 1640,
+        "wires": [
+            [
+                "ebfea15e.e7635"
+            ]
+        ]
+    },
+    {
+        "id": "ebfea15e.e7635",
+        "type": "data-mapping",
+        "z": "74fd2ead.467bb",
+        "server": "8c83b301.9e6b7",
+        "profileKey": "testing_profile2",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "failFlow": true,
+        "x": 300,
+        "y": 1640,
+        "wires": [
+            [
+                "af215349.0b78"
+            ]
+        ]
+    },
+    {
+        "id": "af215349.0b78",
+        "type": "debug",
+        "z": "74fd2ead.467bb",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 500,
+        "y": 1640,
+        "wires": []
+    },
+    {
+        "id": "d8db8e8f.6a0bb",
+        "type": "data-mapping",
+        "z": "74fd2ead.467bb",
+        "server": "8c83b301.9e6b7",
+        "profileKey": "testing_profile3",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "failFlow": true,
+        "x": 300,
+        "y": 1700,
+        "wires": [
+            [
+                "e717713.2dd519"
+            ]
+        ]
+    },
+    {
+        "id": "e717713.2dd519",
+        "type": "debug",
+        "z": "74fd2ead.467bb",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 500,
+        "y": 1700,
+        "wires": []
+    },
+    {
+        "id": "cb0c6b15.f9e4e8",
+        "type": "inject",
+        "z": "74fd2ead.467bb",
+        "name": "",
+        "topic": "",
+        "payload": "{\"prop1\":\"property1\",\"prop2\":123456,\"data\":[{\"username\":\"some user\"}]}",
+        "payloadType": "json",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 110,
+        "y": 1700,
+        "wires": [
+            [
+                "d8db8e8f.6a0bb"
+            ]
+        ]
+    },
+    {
+        "id": "8c83b301.9e6b7",
+        "type": "agilite-login",
+        "z": "",
+        "serverType": "2",
+        "server": "http://localhost:6010",
+        "name": "Local"
+    }
+]

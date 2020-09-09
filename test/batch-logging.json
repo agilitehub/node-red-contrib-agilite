@@ -1,0 +1,438 @@
+[
+  {
+      "id": "e56bfb8a.4d18d8",
+      "type": "inject",
+      "z": "74fd2ead.467bb",
+      "name": "Go",
+      "topic": "",
+      "payload": "{\"qry\":{\"data.uri\":\"/batchlogging/report\"},\"fieldsToReturn\":\"data.uri\"}",
+      "payloadType": "json",
+      "repeat": "",
+      "crontab": "",
+      "once": false,
+      "onceDelay": "",
+      "x": 90,
+      "y": 4960,
+      "wires": [
+          [
+              "cb99a415.fa8128"
+          ]
+      ]
+  },
+  {
+      "id": "7446db9.4846d24",
+      "type": "debug",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "active": true,
+      "tosidebar": true,
+      "console": false,
+      "tostatus": false,
+      "complete": "false",
+      "x": 570,
+      "y": 4960,
+      "wires": []
+  },
+  {
+      "id": "c63ea448.5c4828",
+      "type": "ui_template",
+      "z": "74fd2ead.467bb",
+      "group": "a9e5b522.ea9828",
+      "name": "Table",
+      "order": 1,
+      "width": "6",
+      "height": "10",
+      "format": "<table mat-table class=\"mat-elevation-z8\" border=\"1\">\n     <tr>\n         <th>Module Name</th>\n         <th>URI</th> \n         <th>Execution API</th>\n         <th>Response Code</th> \n         <th>Method</th>\n         <th>Created At</th> \n         <th>Created By</th> \n     </tr>\n     <tbody>\n         <tr ng-repeat=\"row in msg.payload\">\n            <td>{{row.data.moduleName}}</td>\n            <td>{{row.data.uri}}</td>\n            <td>{{row.data.isExecutionApi}}</td>\n            <td>{{row.data.responseCode}}</td>\n            <td>{{row.data.method}}</td>\n            <td>{{row.createdAt}}</td>\n            <td>{{row.createdBy}}</td>\n         </tr>\n     </tbody>\n</table>\n",
+      "storeOutMessages": false,
+      "fwdInMessages": false,
+      "templateScope": "local",
+      "x": 410,
+      "y": 4960,
+      "wires": [
+          [
+              "7446db9.4846d24"
+          ]
+      ]
+  },
+  {
+      "id": "cb99a415.fa8128",
+      "type": "batch-logging",
+      "z": "74fd2ead.467bb",
+      "server": "8c83b301.9e6b7",
+      "profileKey": "testing",
+      "processId": "5e46227111a17439d26c4290",
+      "field": "payload",
+      "fieldType": "msg",
+      "failFlow": true,
+      "actionType": "5",
+      "x": 240,
+      "y": 4960,
+      "wires": [
+          [
+              "c63ea448.5c4828",
+              "7446db9.4846d24"
+          ]
+      ]
+  },
+  {
+      "id": "a030b9d7.a2a5a8",
+      "type": "comment",
+      "z": "74fd2ead.467bb",
+      "name": "Logs UI",
+      "info": "",
+      "x": 90,
+      "y": 4920,
+      "wires": []
+  },
+  {
+      "id": "ba6d6375.974f4",
+      "type": "comment",
+      "z": "74fd2ead.467bb",
+      "name": "Batch Logging test case flow",
+      "info": "",
+      "x": 160,
+      "y": 4500,
+      "wires": []
+  },
+  {
+      "id": "df09d411.dc9dd8",
+      "type": "inject",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "topic": "",
+      "payload": "",
+      "payloadType": "date",
+      "repeat": "",
+      "crontab": "",
+      "once": false,
+      "onceDelay": 0.1,
+      "x": 120,
+      "y": 4540,
+      "wires": [
+          [
+              "d4d75c6a.210e4"
+          ]
+      ]
+  },
+  {
+      "id": "3f240ab5.41fa96",
+      "type": "comment",
+      "z": "74fd2ead.467bb",
+      "name": "Init",
+      "info": "",
+      "x": 150,
+      "y": 4620,
+      "wires": []
+  },
+  {
+      "id": "d4d75c6a.210e4",
+      "type": "function",
+      "z": "74fd2ead.467bb",
+      "name": "Prep Data Object",
+      "func": "var key = null;\n\n// Set Key\nflow.set(\"batchLogging.key\", \"node-red-testing\");\nkey = flow.get(\"batchLogging.key\");\n\n// Test if key is null\nif(key !== null){\n    node.warn(\"key is not equal to null\");\n}else{\n    node.error(\"key is equal to null\");\n}\n\nmsg.key = key;\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 190,
+      "y": 4580,
+      "wires": [
+          [
+              "75a4c4d4.87066c"
+          ]
+      ]
+  },
+  {
+      "id": "5f8df169.9e17",
+      "type": "type-detect",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "field": "payload",
+      "fieldType": "msg",
+      "x": 330,
+      "y": 4640,
+      "wires": [
+          [
+              "e58898dd.bf5828"
+          ]
+      ]
+  },
+  {
+      "id": "e58898dd.bf5828",
+      "type": "function",
+      "z": "74fd2ead.467bb",
+      "name": "Test Result Type",
+      "func": "if(msg.payload === \"string\"){\n    node.warn(\"Response is a String\");\n}else{\n    node.error(\"Response is not a String\");\n}\n\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 500,
+      "y": 4640,
+      "wires": [
+          []
+      ]
+  },
+  {
+      "id": "a410dfd5.cc7bc",
+      "type": "http in",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "url": "/logs",
+      "method": "get",
+      "upload": false,
+      "swaggerDoc": "",
+      "x": 290,
+      "y": 4540,
+      "wires": [
+          [
+              "d4d75c6a.210e4"
+          ]
+      ]
+  },
+  {
+      "id": "9094e62b.083fe8",
+      "type": "type-detect",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "field": "payload",
+      "fieldType": "msg",
+      "x": 370,
+      "y": 4740,
+      "wires": [
+          [
+              "189bacd2.a71dc3"
+          ]
+      ]
+  },
+  {
+      "id": "189bacd2.a71dc3",
+      "type": "function",
+      "z": "74fd2ead.467bb",
+      "name": "Test Result Type",
+      "func": "if(msg.payload === \"Object\"){\n    node.warn(\"Response is a Object\");\n}else{\n    node.error(\"Response is not a Object\");\n}\n\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 540,
+      "y": 4740,
+      "wires": [
+          []
+      ]
+  },
+  {
+      "id": "4fb24a3c.6e26e4",
+      "type": "link out",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "links": [
+          "8ea04d20.bec96",
+          "ce2eff45.b0da4"
+      ],
+      "x": 275,
+      "y": 4680,
+      "wires": []
+  },
+  {
+      "id": "8ea04d20.bec96",
+      "type": "link in",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "links": [
+          "4fb24a3c.6e26e4"
+      ],
+      "x": 75,
+      "y": 4760,
+      "wires": [
+          [
+              "ade6a640.4d1428"
+          ]
+      ]
+  },
+  {
+      "id": "bc77edec.9e47c",
+      "type": "comment",
+      "z": "74fd2ead.467bb",
+      "name": "Subscribe",
+      "info": "",
+      "x": 160,
+      "y": 4720,
+      "wires": []
+  },
+  {
+      "id": "75a4c4d4.87066c",
+      "type": "batch-logging",
+      "z": "74fd2ead.467bb",
+      "server": "8c83b301.9e6b7",
+      "profileKey": "{{key}}",
+      "processId": "5e46227111a17439d26c4290",
+      "field": "payload",
+      "fieldType": "msg",
+      "failFlow": true,
+      "actionType": "1",
+      "x": 160,
+      "y": 4660,
+      "wires": [
+          [
+              "5f8df169.9e17",
+              "4fb24a3c.6e26e4"
+          ]
+      ]
+  },
+  {
+      "id": "ade6a640.4d1428",
+      "type": "batch-logging",
+      "z": "74fd2ead.467bb",
+      "server": "8c83b301.9e6b7",
+      "profileKey": "{{key}}",
+      "processId": "{{payload}}",
+      "field": "payload",
+      "fieldType": "msg",
+      "failFlow": true,
+      "actionType": "2",
+      "x": 200,
+      "y": 4760,
+      "wires": [
+          [
+              "9094e62b.083fe8",
+              "e1d9b3c8.34a87"
+          ]
+      ]
+  },
+  {
+      "id": "c3562c32.4701b",
+      "type": "type-detect",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "field": "payload",
+      "fieldType": "msg",
+      "x": 370,
+      "y": 4840,
+      "wires": [
+          [
+              "88ee61f7.20209"
+          ]
+      ]
+  },
+  {
+      "id": "88ee61f7.20209",
+      "type": "function",
+      "z": "74fd2ead.467bb",
+      "name": "Test Result Type",
+      "func": "if(msg.payload === \"Object\"){\n    node.warn(\"Response is a Object\");\n}else{\n    node.error(\"Response is not a Object\");\n}\n\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 540,
+      "y": 4840,
+      "wires": [
+          []
+      ]
+  },
+  {
+      "id": "58d80627.680428",
+      "type": "http response",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "statusCode": "",
+      "headers": {},
+      "x": 510,
+      "y": 4880,
+      "wires": []
+  },
+  {
+      "id": "47bd112f.ce80d",
+      "type": "link in",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "links": [
+          "e1d9b3c8.34a87"
+      ],
+      "x": 75,
+      "y": 4860,
+      "wires": [
+          [
+              "53e0d8db.250bb8"
+          ]
+      ]
+  },
+  {
+      "id": "7961a0cc.900f2",
+      "type": "comment",
+      "z": "74fd2ead.467bb",
+      "name": "Get By Profile Key",
+      "info": "",
+      "x": 190,
+      "y": 4820,
+      "wires": []
+  },
+  {
+      "id": "53e0d8db.250bb8",
+      "type": "batch-logging",
+      "z": "74fd2ead.467bb",
+      "server": "8c83b301.9e6b7",
+      "profileKey": "node-red-testing",
+      "processId": "{{payload}}",
+      "field": "payload",
+      "fieldType": "msg",
+      "failFlow": true,
+      "actionType": "3",
+      "x": 200,
+      "y": 4860,
+      "wires": [
+          [
+              "c3562c32.4701b",
+              "48d2646d.4ca15c"
+          ]
+      ]
+  },
+  {
+      "id": "e1d9b3c8.34a87",
+      "type": "link out",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "links": [
+          "47bd112f.ce80d"
+      ],
+      "x": 315,
+      "y": 4780,
+      "wires": []
+  },
+  {
+      "id": "48d2646d.4ca15c",
+      "type": "function",
+      "z": "74fd2ead.467bb",
+      "name": "Test Result",
+      "func": "if(msg.payload.hasOwnProperty(\"key\")){\n    node.warn(\"Result has property 'key'\");\n}else{\n    node.error(\"Result does not have property 'key'\");\n}\n\nif(msg.payload.hasOwnProperty(\"name\")){\n    node.warn(\"Result has property 'name'\");\n}else{\n    node.error(\"Result does not have property 'name'\");\n}\n\nif(msg.payload.hasOwnProperty(\"description\")){\n    node.warn(\"Result has property 'description'\");\n}else{\n    node.error(\"Result does not have property 'description'\");\n}\n\nif(msg.payload.hasOwnProperty(\"groupName\")){\n    node.warn(\"Result has property 'groupName'\");\n}else{\n    node.error(\"Result does not have property 'groupName'\");\n}\n\nif(msg.payload.hasOwnProperty(\"notes\")){\n    node.warn(\"Result has property 'notes'\");\n}else{\n    node.error(\"Result does not have property 'notes'\");\n}\n\nif(msg.payload.hasOwnProperty(\"logLevel\")){\n    node.warn(\"Result has property 'logLevel'\");\n}else{\n    node.error(\"Result does not have property 'logLevel'\");\n}\n\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 370,
+      "y": 4880,
+      "wires": [
+          [
+              "58d80627.680428"
+          ]
+      ]
+  },
+  {
+      "id": "a9e5b522.ea9828",
+      "type": "ui_group",
+      "z": "",
+      "name": "Logs",
+      "tab": "af5d51c6.7d363",
+      "disp": true,
+      "width": "6",
+      "collapse": false
+  },
+  {
+      "id": "8c83b301.9e6b7",
+      "type": "agilite-login",
+      "z": "",
+      "serverType": "2",
+      "server": "http://localhost:6010",
+      "name": "Local"
+  },
+  {
+      "id": "af5d51c6.7d363",
+      "type": "ui_tab",
+      "z": "",
+      "name": "Home",
+      "icon": "dashboard",
+      "disabled": false,
+      "hidden": false
+  }
+]

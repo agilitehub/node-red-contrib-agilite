@@ -1,0 +1,276 @@
+[
+  {
+      "id": "d3350854.0d48a8",
+      "type": "comment",
+      "z": "74fd2ead.467bb",
+      "name": "Events test case flow",
+      "info": "",
+      "x": 140,
+      "y": 4080,
+      "wires": []
+  },
+  {
+      "id": "1ceb6b8f.6972e4",
+      "type": "inject",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "topic": "",
+      "payload": "",
+      "payloadType": "date",
+      "repeat": "",
+      "crontab": "",
+      "once": false,
+      "onceDelay": 0.1,
+      "x": 120,
+      "y": 4120,
+      "wires": [
+          [
+              "df723b23.bff0b8"
+          ]
+      ]
+  },
+  {
+      "id": "b88488f7.b86eb8",
+      "type": "comment",
+      "z": "74fd2ead.467bb",
+      "name": "Execute",
+      "info": "",
+      "x": 160,
+      "y": 4200,
+      "wires": []
+  },
+  {
+      "id": "df723b23.bff0b8",
+      "type": "function",
+      "z": "74fd2ead.467bb",
+      "name": "Prep Data Object",
+      "func": "var key = null;\n\n// Set Key\nflow.set(\"events.key\", \"node-red-testing\");\nkey = flow.get(\"events.key\");\n\n// Test if key is null\nif(key !== null){\n    node.warn(\"key is not equal to null\");\n}else{\n    node.error(\"key is equal to null\");\n}\n\nmsg.key = key;\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 190,
+      "y": 4160,
+      "wires": [
+          [
+              "ebf4b01a.6d05e"
+          ]
+      ]
+  },
+  {
+      "id": "b86049bf.7532f8",
+      "type": "type-detect",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "field": "payload",
+      "fieldType": "msg",
+      "x": 330,
+      "y": 4220,
+      "wires": [
+          [
+              "7eaf3e33.fc4ed"
+          ]
+      ]
+  },
+  {
+      "id": "7eaf3e33.fc4ed",
+      "type": "function",
+      "z": "74fd2ead.467bb",
+      "name": "Test Result Type",
+      "func": "if(msg.payload === \"Object\"){\n    node.warn(\"Response is a Object\");\n}else{\n    node.error(\"Response is not a Object\");\n}\n\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 500,
+      "y": 4220,
+      "wires": [
+          []
+      ]
+  },
+  {
+      "id": "86cff880.7b08e8",
+      "type": "function",
+      "z": "74fd2ead.467bb",
+      "name": "Test Result",
+      "func": "if(msg.payload.result === \"Greetings from Agilit-e\"){\n    node.warn(\"Result is Correct\");\n}else{\n    node.error(\"Result is Incorrect\");\n}\n\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 330,
+      "y": 4260,
+      "wires": [
+          [
+              "20b57586.11787a"
+          ]
+      ]
+  },
+  {
+      "id": "2c78c8cf.b2de68",
+      "type": "http in",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "url": "/events",
+      "method": "get",
+      "upload": false,
+      "swaggerDoc": "",
+      "x": 300,
+      "y": 4120,
+      "wires": [
+          [
+              "df723b23.bff0b8"
+          ]
+      ]
+  },
+  {
+      "id": "ebf4b01a.6d05e",
+      "type": "events",
+      "z": "74fd2ead.467bb",
+      "server": "8c83b301.9e6b7",
+      "profileKey": "{{key}}",
+      "field": "payload",
+      "fieldType": "msg",
+      "failFlow": true,
+      "actionType": "1",
+      "x": 170,
+      "y": 4240,
+      "wires": [
+          [
+              "b86049bf.7532f8",
+              "86cff880.7b08e8"
+          ]
+      ]
+  },
+  {
+      "id": "29799d11.13daf2",
+      "type": "events",
+      "z": "74fd2ead.467bb",
+      "server": "8c83b301.9e6b7",
+      "profileKey": "{{key}}",
+      "field": "payload",
+      "fieldType": "msg",
+      "failFlow": true,
+      "actionType": "2",
+      "x": 150,
+      "y": 4400,
+      "wires": [
+          [
+              "eb4000d0.f257a",
+              "ec67d52d.491a38"
+          ]
+      ]
+  },
+  {
+      "id": "ec67d52d.491a38",
+      "type": "type-detect",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "field": "payload",
+      "fieldType": "msg",
+      "x": 310,
+      "y": 4380,
+      "wires": [
+          [
+              "6f495fa1.e578d"
+          ]
+      ]
+  },
+  {
+      "id": "6f495fa1.e578d",
+      "type": "function",
+      "z": "74fd2ead.467bb",
+      "name": "Test Result Type",
+      "func": "if(msg.payload === \"Object\"){\n    node.warn(\"Response is a Object\");\n}else{\n    node.error(\"Response is not a Object\");\n}\n\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 480,
+      "y": 4380,
+      "wires": [
+          []
+      ]
+  },
+  {
+      "id": "eb4000d0.f257a",
+      "type": "function",
+      "z": "74fd2ead.467bb",
+      "name": "Test Result",
+      "func": "if(msg.payload.hasOwnProperty(\"name\")){\n    node.warn(\"Result has property 'name'\");\n}else{\n    node.error(\"Result does not have property 'name'\");\n}\n\nif(msg.payload.hasOwnProperty(\"webhookUrl\")){\n    node.warn(\"Result has property 'webhookUrl'\");\n}else{\n    node.error(\"Result does not have property 'webhookUrl'\");\n}\n\nif(msg.payload.hasOwnProperty(\"subscriberType\")){\n    node.warn(\"Result has property 'subscriberType'\");\n}else{\n    node.error(\"Result does not have property 'subscriberType'\");\n}\n\nif(msg.payload.hasOwnProperty(\"subscriber\")){\n    node.warn(\"Result has property 'subscriber'\");\n}else{\n    node.error(\"Result does not have property 'subscriber'\");\n}\n\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 310,
+      "y": 4420,
+      "wires": [
+          [
+              "b262646d.248fd8"
+          ]
+      ]
+  },
+  {
+      "id": "b262646d.248fd8",
+      "type": "http response",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "statusCode": "",
+      "headers": {},
+      "x": 470,
+      "y": 4420,
+      "wires": []
+  },
+  {
+      "id": "20b57586.11787a",
+      "type": "link out",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "links": [
+          "399c7dfe.5cc102"
+      ],
+      "x": 435,
+      "y": 4260,
+      "wires": []
+  },
+  {
+      "id": "399c7dfe.5cc102",
+      "type": "link in",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "links": [
+          "20b57586.11787a"
+      ],
+      "x": 75,
+      "y": 4340,
+      "wires": [
+          [
+              "e15a4728.329b68"
+          ]
+      ]
+  },
+  {
+      "id": "e15a4728.329b68",
+      "type": "function",
+      "z": "74fd2ead.467bb",
+      "name": "Prep Data Object",
+      "func": "msg.payload = {\n    \"name\": \"subscription1\",\n    \"webhookUrl\": \"http://localhost:6010/ping\",\n    \"subscriberType\": \"apikey\",\n    \"subscriber\": \"node-red\"\n}\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 210,
+      "y": 4340,
+      "wires": [
+          [
+              "29799d11.13daf2"
+          ]
+      ]
+  },
+  {
+      "id": "70a96f6.43db19",
+      "type": "comment",
+      "z": "74fd2ead.467bb",
+      "name": "Subscribe",
+      "info": "",
+      "x": 160,
+      "y": 4300,
+      "wires": []
+  },
+  {
+      "id": "8c83b301.9e6b7",
+      "type": "agilite-login",
+      "z": "",
+      "serverType": "2",
+      "server": "http://localhost:6010",
+      "name": "Local"
+  }
+]

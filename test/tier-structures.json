@@ -1,0 +1,134 @@
+[
+  {
+      "id": "92d52f10.904a6",
+      "type": "comment",
+      "z": "74fd2ead.467bb",
+      "name": "Tier Structures test case flow",
+      "info": "",
+      "x": 160,
+      "y": 3540,
+      "wires": []
+  },
+  {
+      "id": "96e4e269.0965f",
+      "type": "inject",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "topic": "",
+      "payload": "",
+      "payloadType": "date",
+      "repeat": "",
+      "crontab": "",
+      "once": false,
+      "onceDelay": 0.1,
+      "x": 120,
+      "y": 3600,
+      "wires": [
+          [
+              "3a734389.1c78cc"
+          ]
+      ]
+  },
+  {
+      "id": "68bca8d9.b21288",
+      "type": "comment",
+      "z": "74fd2ead.467bb",
+      "name": "Execute",
+      "info": "",
+      "x": 160,
+      "y": 3680,
+      "wires": []
+  },
+  {
+      "id": "3a734389.1c78cc",
+      "type": "function",
+      "z": "74fd2ead.467bb",
+      "name": "Prep Data Object",
+      "func": "var key = null;\n\n// Set Key\nflow.set(\"tierstructures.tierKeys\", \"node-red-testing\");\ntierKeys = flow.get(\"tierstructures.tierKeys\");\n\n// Test if key is null\nif(tierKeys !== null){\n    node.warn(\"tierKeys is not equal to null\");\n}else{\n    node.error(\"tierKeys is equal to null\");\n}\n\nmsg.tierKeys = tierKeys;\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 190,
+      "y": 3640,
+      "wires": [
+          [
+              "c10a4577.1b8bf8"
+          ]
+      ]
+  },
+  {
+      "id": "b9e0f5d6.a48ed8",
+      "type": "type-detect",
+      "z": "74fd2ead.467bb",
+      "name": "",
+      "field": "payload",
+      "fieldType": "msg",
+      "x": 350,
+      "y": 3720,
+      "wires": [
+          [
+              "c384c680.6adda8"
+          ]
+      ]
+  },
+  {
+      "id": "c384c680.6adda8",
+      "type": "function",
+      "z": "74fd2ead.467bb",
+      "name": "Test Result Type",
+      "func": "if(msg.payload === \"Object\"){\n    node.warn(\"Response is a Object\");\n}else{\n    node.error(\"Response is not a Object\");\n}\n\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 520,
+      "y": 3720,
+      "wires": [
+          []
+      ]
+  },
+  {
+      "id": "c10a4577.1b8bf8",
+      "type": "tier-structures",
+      "z": "74fd2ead.467bb",
+      "server": "8c83b301.9e6b7",
+      "actionType": "1",
+      "tierKeys": "{{tierKeys}}",
+      "includeValues": true,
+      "includeMetaData": true,
+      "includeTierEntries": true,
+      "sortValues": "",
+      "valuesOutputFormat": "string",
+      "name": "",
+      "field": "payload",
+      "fieldType": "msg",
+      "failFlow": true,
+      "x": 180,
+      "y": 3720,
+      "wires": [
+          [
+              "b9e0f5d6.a48ed8",
+              "99ef065c.183268"
+          ]
+      ]
+  },
+  {
+      "id": "99ef065c.183268",
+      "type": "function",
+      "z": "74fd2ead.467bb",
+      "name": "Test Result",
+      "func": "if(msg.payload.hasOwnProperty(\"isActive\")){\n    node.warn(\"Result has property 'isActive'\");\n}else{\n    node.error(\"Result does not have property 'isActive'\");\n}\n\nif(msg.payload.hasOwnProperty(\"key\")){\n    node.warn(\"Result has property 'key'\");\n}else{\n    node.error(\"Result does not have property 'key'\");\n}\n\nif(msg.payload.hasOwnProperty(\"description\")){\n    node.warn(\"Result has property 'description'\");\n}else{\n    node.error(\"Result does not have property 'description'\");\n}\n\nif(msg.payload.hasOwnProperty(\"values\")){\n    node.warn(\"Result has property 'values'\");\n}else{\n    node.error(\"Result does not have property 'values'\");\n}\n\nif(msg.payload.hasOwnProperty(\"tierEntries\")){\n    node.warn(\"Result has property 'tierEntries'\");\n}else{\n    node.error(\"Result does not have property 'values'\");\n}\n\nif(msg.payload.tierEntries[0].hasOwnProperty(\"tierEntries\")){\n    node.warn(\"tierEntries Array has property 'tierEntries'\");\n}else{\n    node.error(\"tierEntries Array does not have property 'tierEntries'\");\n}\n\nif(msg.payload.tierEntries[0].hasOwnProperty(\"values\")){\n    node.warn(\"tierEntries Array has property 'values'\");\n}else{\n    node.error(\"tierEntries Array does not have property 'values'\");\n}\n\nreturn msg;",
+      "outputs": 1,
+      "noerr": 0,
+      "x": 350,
+      "y": 3760,
+      "wires": [
+          []
+      ]
+  },
+  {
+      "id": "8c83b301.9e6b7",
+      "type": "agilite-login",
+      "z": "",
+      "serverType": "2",
+      "server": "http://localhost:6010",
+      "name": "Local"
+  }
+]

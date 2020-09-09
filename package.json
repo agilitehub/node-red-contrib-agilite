@@ -1,0 +1,73 @@
+{
+  "name": "node-red-contrib-agilite",
+  "license": "MIT",
+  "version": "7.0.0",
+  "description": "Node-RED nodes to integrate with Agilit-e cloud or Agilit-e on-prem",
+  "homepage": "https://agilite.io",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agilitehub/node-modules/tree/master/node-red-contrib-agilite"
+  },
+  "bugs": {
+    "url": "https://github.com/agilitehub/node-modules/issues",
+    "email": "support@agilite.io"
+  },
+  "author": "Agilit-e",
+  "contributors": [
+    {
+      "name": "John Jardin",
+      "email": "support@agilite.io",
+      "url": "https://agilite.io"
+    },
+    {
+      "name": "Armand Smit",
+      "email": "support@agilite.io",
+      "url": "https://agilite.io"
+    }
+  ],
+  "dependencies": {
+    "agilite": "6.9.6",
+    "axios": "0.19.2"
+  },
+  "keywords": [
+    "node-red",
+    "agilit-e",
+    "agilite",
+    "microservices",
+    "keywords",
+    "numbering",
+    "connectors",
+    "data mapping",
+    "templates",
+    "files",
+    "roles",
+    "bpm",
+    "workflow",
+    "business process management",
+    "xmltojs",
+    "jstoxml",
+    "xml",
+    "xml-js",
+    "js-xml",
+    "encode xml",
+    "decode xml"
+  ],
+  "node-red": {
+    "nodes": {
+      "Agilite Login": "configuration/agilite-login.js",
+      "Keywords": "keywords/keywords.js",
+      "Tier Structures": "tier-structures/tier-structures.js",
+      "Numbering": "numbering/numbering.js",
+      "Connectors": "connectors/connectors.js",
+      "Data Mapping": "data-mapping/data-mapping.js",
+      "Templates": "templates/templates.js",
+      "BPM": "bpm/bpm.js",
+      "Roles": "roles/roles.js",
+      "Batch Actions": "batch-actions/batch-actions.js",
+      "Events": "events/events.js",
+      "Batch Logging": "batch-logging/batch-logging.js",
+      "Files": "files/files.js",
+      "Adhoc": "adhoc/adhoc.js"
+    }
+  }
+}

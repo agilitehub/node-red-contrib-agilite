@@ -1,0 +1,210 @@
+<script type="text/javascript">
+  var agiliteBatchLoggingFunctions = {
+    updateActionType:function(){
+        var value = $("#node-input-actionType option:selected").val();
+
+        switch(value){
+          case "1": // Init Log Process
+            document.querySelector("#rowProfileKey").style.display = "block";
+            document.querySelector("#rowProcessId").style.display = "none";
+            document.querySelector("#rowQry").style.display = "none";
+            document.querySelector("#rowFieldsToReturn").style.display = "none";
+            document.querySelector("#rowQryOptions").style.display = "none";
+            document.querySelector("#rowPage").style.display = "none";
+            document.querySelector("#rowPageLimit").style.display = "none";
+            break;
+          case "2": // Complete Log Process
+            document.querySelector("#rowProfileKey").style.display = "none";
+            document.querySelector("#rowProcessId").style.display = "block";
+            document.querySelector("#rowQry").style.display = "none";
+            document.querySelector("#rowFieldsToReturn").style.display = "none";
+            document.querySelector("#rowQryOptions").style.display = "none";
+            document.querySelector("#rowPage").style.display = "none";
+            document.querySelector("#rowPageLimit").style.display = "none";
+            break;
+          case "3": // Get By Profile Key
+            document.querySelector("#rowProfileKey").style.display = "block";
+            document.querySelector("#rowProcessId").style.display = "none";
+            document.querySelector("#rowQry").style.display = "none";
+            document.querySelector("#rowFieldsToReturn").style.display = "none";
+            document.querySelector("#rowQryOptions").style.display = "none";
+            document.querySelector("#rowPage").style.display = "none";
+            document.querySelector("#rowPageLimit").style.display = "none";
+            break;
+          case "4": // Create Log Entry
+            document.querySelector("#rowProfileKey").style.display = "none";
+            document.querySelector("#rowProcessId").style.display = "block";
+            document.querySelector("#rowQry").style.display = "none";
+            document.querySelector("#rowFieldsToReturn").style.display = "none";
+            document.querySelector("#rowQryOptions").style.display = "none";
+            document.querySelector("#rowPage").style.display = "none";
+            document.querySelector("#rowPageLimit").style.display = "none";
+            break;
+          case "5": // Generate Log Processs Report
+            document.querySelector("#rowProfileKey").style.display = "none";
+            document.querySelector("#rowProcessId").style.display = "block";
+            document.querySelector("#rowQry").style.display = "block";
+            document.querySelector("#rowFieldsToReturn").style.display = "block";
+            document.querySelector("#rowQryOptions").style.display = "block";
+            document.querySelector("#rowPage").style.display = "block";
+            document.querySelector("#rowPageLimit").style.display = "block";
+            break;
+          default:
+            document.querySelector("#rowProfileKey").style.display = "none";
+            document.querySelector("#rowProcessId").style.display = "none";
+            document.querySelector("#rowQry").style.display = "none";
+            document.querySelector("#rowFieldsToReturn").style.display = "none";
+            document.querySelector("#rowQryOptions").style.display = "none";
+            document.querySelector("#rowPage").style.display = "none";
+            document.querySelector("#rowPageLimit").style.display = "none";
+            break;
+        }
+    }
+  }
+
+  RED.nodes.registerType('batch-logging',{
+    category: "agilite",
+    inputs: 1,
+    outputs:1,
+    icon: "font-awesome/fa-connectdevelop",
+    color: "#ffa4a2",
+    label: function() {
+        return this.name|| "Batch Logging";
+    },
+    paletteLabel : "batch logging",
+    defaults : {
+      server: {
+        value : "",
+        required: true,
+        type: "agilite-login"
+      },
+      name: {
+        value: ""
+      },
+      profileKey: {
+        value : ""
+      },
+      processId: {
+        value : ""
+      },
+      qry: {
+        value: ""
+      },
+      fieldsToReturn: {
+        value: ""
+      },
+      qryOptions: {
+        value: ""
+      },
+      page: {
+        value: ""
+      },
+      pageLimit: {
+        value: ""
+      },
+      field: {
+        value: "payload",
+      },
+      fieldType: {
+        value: "msg"
+      },
+      failFlow: {
+        value: true
+      },
+      actionType: {
+        value : "",
+        required : true
+      }
+    },
+    oneditprepare: function() {
+      $("#node-input-actionType").change(function(){agiliteBatchLoggingFunctions.updateActionType()});
+      agiliteBatchLoggingFunctions.updateActionType();
+
+      if (!this.fieldType)
+          this.fieldType = 'msg';
+
+      $("#node-input-field").typedInput({
+          default: 'msg',
+          types: ['msg','flow','global'],
+          typeField: $("#node-input-fieldType")
+      });
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="batch-logging">
+  <div class="form-row">
+    <label for="node-input-server"><i class="fa fa-server"></i> Server</label>
+    <input type="text" id="node-input-server" placeholder="Server"></input>
+  </div>
+  <div class="form-row" id="rowActionType">
+    <label for="node-input-actionType"><i class="fa fa-arrow-circle-right"></i> Action Type</label>
+    <select id="node-input-actionType" style="width:auto;">
+      <option value="1">Init Log Process</option>
+      <option value="2">Complete Log Process</option>
+      <option value="3">Get By Profile Key</option>
+      <option value="4">Create Log Entry</option>
+      <option value="5">Generate Log Processs Report</option>
+    </select>
+  </div>
+  <div class="form-row" id="rowProfileKey">
+    <label for="node-input-profileKey"><i class="fa fa-key"></i>Profile Key {{m}}</label>
+    <input type="text" id="node-input-profileKey" />
+  </div>
+  <div class="form-row" id="rowProcessId">
+    <label for="node-input-processId"><i class="fa fa-key"></i>Log Process Id {{m}}</label>
+    <input type="text" id="node-input-processId" />
+  </div>
+  <div class="form-row" id="rowQry">
+    <label for="node-input-qry">Query {{m}}</label>
+    <input type="text" id="node-input-qry" />
+  </div>
+  <div class="form-row" id="rowFieldsToReturn">
+    <label for="node-input-fieldsToReturn">Fields To Return {{m}}</label>
+    <input type="text" id="node-input-fieldsToReturn" />
+  </div>
+  <div class="form-row" id="rowQryOptions">
+    <label for="node-input-qryOptions">Query Options {{m}}</label>
+    <input type="text" id="node-input-qryOptions" />
+  </div>
+  <div class="form-row" id="rowPage">
+    <label for="node-input-page">Page {{m}}</label>
+    <input type="text" id="node-input-page" />
+  </div>
+  <div class="form-row" id="rowPageLimit">
+    <label for="node-input-pageLimit">Page Limit {{m}}</label>
+    <input type="text" id="node-input-pageLimit" />
+  </div>
+  <div class="form-row">
+        <label for="node-input-field"><i class="fa fa-edit"></i> <span data-i18n="template.label.property">Output to</span></label>
+        <input type="text" id="node-input-field" placeholder="payload" style="width:250px;">
+        <input type="hidden" id="node-input-fieldType">
+  </div>
+  <div class="form-row">
+    <label for="node-input-failFlow"><i class="fa fa-exclamation-triangle"></i> <span data-i18n="template.label.property">Fail Flow on Error</span></label>
+    <input type="checkbox" id="node-input-failFlow" style="width:initial;" /> Yes
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Node Name" />
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="batch-logging">
+<h4>Description</h4>
+<p>A node to have Agilit-e process Batch Logging operations</p>
+<p>Fields where the label includes {{m}} are mustache-enabled fields relative to the msg object</p>
+
+<h4>Input</h4
+<p>The Profile Key can either be manually specified in the UI Form of this node or via Mustache, or passed programmatically via <code>msg.agilite.batchlogging.profileKey</code></p>
+<p>Any additional attributes that need to be passed to the API can be specified in <code>msg.payload</code></p>
+
+<h4>Output</h4>
+<p>The output of this node delivers various JavaScript objects to where the <code>Output To</code> field is pointing, <code>msg.payload</code> by default,. These outputs are dependent on the type of API that was called by the Batch Log</p>
+<p>Additional information about the API result can be found in the following <code>msg.agilite</code> attributes:
+  <ul>
+      <li><code>msg.agilite.success</code>: Boolean</li>
+      <li><code>msg.agilite.messages</code>: Array (List of error messages if success = false)</li>
+  </ul>
+</p>
+</script>
