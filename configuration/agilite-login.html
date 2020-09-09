@@ -42,11 +42,9 @@
         return false;
       }
 
-      url = url + "/user/authenticatetoken";
-
       $.ajax({
         type: "GET",
-        url: url,
+        url,
         beforeSend: function(xhr){xhr.setRequestHeader('api-key', apiKey);},
         success: function(result){
           agiliteGlobals.hasApiKey = true;

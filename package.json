@@ -1,7 +1,7 @@
 {
   "name": "node-red-contrib-agilite",
   "license": "MIT",
-  "version": "7.0.1",
+  "version": "7.0.2",
   "description": "Node-RED nodes to integrate with Agilit-e cloud or Agilit-e on-prem",
   "homepage": "https://agilite.io",
   "repository": {
