@@ -29,6 +29,7 @@ module.exports = function (RED) {
       let labelKey = config.labelKey
       let valueKey = config.valueKey
       let sortBy = config.sortBy
+      let sortBy2 = config.sortBy2
       let outputFormat = config.outputFormat
       let outputFormat2 = config.outputFormat2
       let url = ''
@@ -154,6 +155,12 @@ module.exports = function (RED) {
           if (msg.agilite.keywords.sortBy) {
             if (msg.agilite.keywords.sortBy !== '') {
               sortBy = msg.agilite.keywords.sortBy
+            }
+          }
+
+          if (msg.agilite.keywords.sortBy2) {
+            if (msg.agilite.keywords.sortBy2 !== '') {
+              sortBy2 = msg.agilite.keywords.sortBy2
             }
           }
 
@@ -289,7 +296,7 @@ module.exports = function (RED) {
             })
           break
         case '2': // Get Profile Keys By Group
-          agilite.Keywords.getProfileKeysByGroup(groupName, sortBy, logProcessId)
+          agilite.Keywords.getProfileKeysByGroup(groupName, sortBy2, logProcessId)
             .then(function (response) {
               reqSuccess(response)
             })
