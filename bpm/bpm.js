@@ -6,7 +6,7 @@ module.exports = function (RED) {
   function Bpm (config) {
     RED.nodes.createNode(this, config)
 
-    let node = this
+    const node = this
     let success = true
     let errorMessage = ''
 
@@ -20,7 +20,13 @@ module.exports = function (RED) {
     })
 
     this.on('input', function (msg) {
-      let serverConfig = RED.nodes.getNode(config.server)
+      const serverConfig = RED.nodes.getNode(config.server)
+      const history = config.excludeHistory
+      const stepOptions = config.excludeStepOptions
+      const visibleObjects = config.excludeVisibleObjects
+      const comments = ''
+      const url = serverConfig.server
+      const failFlow = config.failFlow
       let agilite = null
       let apiKey = ''
       let logProcessId = null
@@ -31,21 +37,16 @@ module.exports = function (RED) {
       let bpmRecordIds = config.bpmRecordIds
       let responsibleUsers = config.responsibleUsers
       let stepNames = config.stepNames
+      let roleNames = config.roleNames
       let relevantUsers = config.relevantUsers
-      let history = config.excludeHistory
-      let stepOptions = config.excludeStepOptions
-      let visibleObjects = config.excludeVisibleObjects
       let profileKeys = config.profileKeys
       let page = config.page
       let pageLimit = config.pageLimit
       let sort = config.sort
-      let comments = ''
-      let url = serverConfig.server
       let data = {}
-      let failFlow = config.failFlow
 
       //  Function that is called inside .then of requests
-      let reqSuccess = function (response) {
+      const reqSuccess = function (response) {
         msg.agilite.message = response.data.errorMessage
 
         switch (node.fieldType) {
@@ -70,7 +71,7 @@ module.exports = function (RED) {
       }
 
       //  Function that is used inside the .catch of requests
-      let reqCatch = function (error) {
+      const reqCatch = function (error) {
         let errorMessage = ''
 
         if (error.response && error.response.data) {
@@ -157,6 +158,12 @@ module.exports = function (RED) {
           if (msg.agilite.bpm.stepNames) {
             if (msg.agilite.bpm.stepNames !== '') {
               stepNames = msg.agilite.bpm.stepNames
+            }
+          }
+
+          if (msg.agilite.bpm.roleNames) {
+            if (msg.agilite.bpm.roleNames !== '') {
+              roleNames = msg.agilite.bpm.roleNames
             }
           }
 
@@ -261,6 +268,38 @@ module.exports = function (RED) {
             }
 
             break
+          case '7': // Assign Role
+            if (profileKey === '') {
+              success = false
+              errorMessage = 'No Profile Key found'
+            } else if (bpmRecordId === '') {
+              success = false
+              errorMessage = 'No BPM Record Id found'
+            } else if (roleNames === '') {
+              success = false
+              errorMessage = 'No Role Name(s) found'
+            } else if (currentUser === '') {
+              success = false
+              errorMessage = 'No Current User found'
+            } else if (responsibleUsers === '') {
+              success = false
+              errorMessage = 'No Responsible User(s) found'
+            }
+
+            break
+          case '8': // Get Assigned Roles
+            if (profileKey === '') {
+              success = false
+              errorMessage = 'No Profile Key found'
+            } else if (bpmRecordId === '') {
+              success = false
+              errorMessage = 'No BPM Record Id found'
+            } else if (roleNames === '') {
+              success = false
+              errorMessage = 'No Role Name(s) found'
+            }
+
+            break
         }
       }
 
@@ -289,6 +328,7 @@ module.exports = function (RED) {
       bpmRecordIds = Mustache.render(bpmRecordIds, msg)
       responsibleUsers = Mustache.render(responsibleUsers, msg)
       stepNames = Mustache.render(stepNames, msg)
+      roleNames = Mustache.render(roleNames, msg)
       relevantUsers = Mustache.render(relevantUsers, msg)
       profileKeys = Mustache.render(profileKeys, msg)
       if (page) page = Mustache.render(page, msg)
@@ -299,6 +339,7 @@ module.exports = function (RED) {
       profileKeys = profileKeys.split(',')
       bpmRecordIds = bpmRecordIds.split(',')
       stepNames = stepNames.split(',')
+      roleNames = roleNames.split(',')
       responsibleUsers = responsibleUsers.split(',')
       relevantUsers = relevantUsers.split(',')
 
@@ -341,6 +382,16 @@ module.exports = function (RED) {
           break
         case '6': // Get Active Users
           agilite.BPM.getActiveUsers(profileKey, logProcessId)
+            .then(reqSuccess)
+            .catch(reqCatch)
+          break
+        case '7': // Assign Role
+          agilite.BPM.assignRole(profileKey, bpmRecordId, roleNames[0], currentUser, responsibleUsers, logProcessId)
+            .then(reqSuccess)
+            .catch(reqCatch)
+          break
+        case '8': // Get Assigned Roles
+          agilite.BPM.getAssignedRoles(profileKey, bpmRecordId, roleNames, logProcessId)
             .then(reqSuccess)
             .catch(reqCatch)
           break

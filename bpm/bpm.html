@@ -19,7 +19,8 @@
             document.querySelector("#rowProfileKeys").style.display = "none";
             document.querySelector("#rowPage").style.display = "none"; 
             document.querySelector("#rowPageLimit").style.display = "none";
-            document.querySelector("#rowSort").style.display = "none"; 
+            document.querySelector("#rowSort").style.display = "none";
+            document.querySelector("#rowRoleNames").style.display = "none"; 
             break;
           case "2"://Execute
             document.querySelector("#rowProfileKey").style.display = "block";
@@ -37,6 +38,7 @@
             document.querySelector("#rowPage").style.display = "none"; 
             document.querySelector("#rowPageLimit").style.display = "none";
             document.querySelector("#rowSort").style.display = "none"; 
+            document.querySelector("#rowRoleNames").style.display = "none"; 
             break;
           case "3"://Get Record State
             document.querySelector("#rowProfileKey").style.display = "none";
@@ -54,7 +56,8 @@
             document.querySelector("#rowProfileKeys").style.display = "block";
             document.querySelector("#rowPage").style.display = "block"; 
             document.querySelector("#rowPageLimit").style.display = "block";
-            document.querySelector("#rowSort").style.display = "block"; 
+            document.querySelector("#rowSort").style.display = "block";
+            document.querySelector("#rowRoleNames").style.display = "none"; 
             break;
           case "4"://Get By Profile Key
             document.querySelector("#rowProfileKey").style.display = "block";
@@ -71,7 +74,8 @@
             document.querySelector("#rowProfileKeys").style.display = "none";
             document.querySelector("#rowPage").style.display = "none"; 
             document.querySelector("#rowPageLimit").style.display = "none";
-            document.querySelector("#rowSort").style.display = "none"; 
+            document.querySelector("#rowSort").style.display = "none";
+            document.querySelector("#rowRoleNames").style.display = "none"; 
             break;
           case "5"://Get Active Steps
             document.querySelector("#rowProfileKey").style.display = "block";
@@ -88,7 +92,8 @@
             document.querySelector("#rowProfileKeys").style.display = "none";
             document.querySelector("#rowPage").style.display = "none"; 
             document.querySelector("#rowPageLimit").style.display = "none";
-            document.querySelector("#rowSort").style.display = "none"; 
+            document.querySelector("#rowSort").style.display = "none";
+            document.querySelector("#rowRoleNames").style.display = "none"; 
             break;
           case "6"://Get Active Users
             document.querySelector("#rowProfileKey").style.display = "block";
@@ -105,7 +110,44 @@
             document.querySelector("#rowProfileKeys").style.display = "none";
             document.querySelector("#rowPage").style.display = "none"; 
             document.querySelector("#rowPageLimit").style.display = "none";
-            document.querySelector("#rowSort").style.display = "none"; 
+            document.querySelector("#rowSort").style.display = "none";
+            document.querySelector("#rowRoleNames").style.display = "none"; 
+          break;
+          case "7": // Assign Role
+            document.querySelector("#rowProfileKey").style.display = "block";
+            document.querySelector("#rowCurrentUser").style.display = "block";
+            document.querySelector("#rowBpmRecordId").style.display = "block";
+            document.querySelector("#rowOptionSelected").style.display = "none";
+            document.querySelector("#rowBpmRecordIds").style.display = "none";
+            document.querySelector("#rowResponsibleUsers").style.display = "block";
+            document.querySelector("#rowStepNames").style.display = "none";
+            document.querySelector("#rowRelevantUsers").style.display = "none";
+            document.querySelector("#rowExcludeHistory").style.display = "none";
+            document.querySelector("#rowExcludeStepOptions").style.display = "none";
+            document.querySelector("#rowExcludeVisibleObjects").style.display = "none";
+            document.querySelector("#rowProfileKeys").style.display = "none";
+            document.querySelector("#rowPage").style.display = "none"; 
+            document.querySelector("#rowPageLimit").style.display = "none";
+            document.querySelector("#rowSort").style.display = "none";
+            document.querySelector("#rowRoleNames").style.display = "block"; 
+          break;
+          case "8": // Get Assigned Roles
+            document.querySelector("#rowProfileKey").style.display = "block";
+            document.querySelector("#rowCurrentUser").style.display = "none";
+            document.querySelector("#rowBpmRecordId").style.display = "block";
+            document.querySelector("#rowOptionSelected").style.display = "none";
+            document.querySelector("#rowBpmRecordIds").style.display = "none";
+            document.querySelector("#rowResponsibleUsers").style.display = "none";
+            document.querySelector("#rowStepNames").style.display = "none";
+            document.querySelector("#rowRelevantUsers").style.display = "none";
+            document.querySelector("#rowExcludeHistory").style.display = "none";
+            document.querySelector("#rowExcludeStepOptions").style.display = "none";
+            document.querySelector("#rowExcludeVisibleObjects").style.display = "none";
+            document.querySelector("#rowProfileKeys").style.display = "none";
+            document.querySelector("#rowPage").style.display = "none"; 
+            document.querySelector("#rowPageLimit").style.display = "none";
+            document.querySelector("#rowSort").style.display = "none";
+            document.querySelector("#rowRoleNames").style.display = "block"; 
           break;
           default:
             document.querySelector("#rowProfileKey").style.display = "none";
@@ -122,7 +164,8 @@
             document.querySelector("#rowProfileKeys").style.display = "none";
             document.querySelector("#rowPage").style.display = "none"; 
             document.querySelector("#rowPageLimit").style.display = "none";
-            document.querySelector("#rowSort").style.display = "none"; 
+            document.querySelector("#rowSort").style.display = "none";
+            document.querySelector("#rowRoleNames").style.display = "none"; 
             break;
         }
     }
@@ -167,6 +210,9 @@
         value : ""
       },
       stepNames: {
+        value:""
+      },
+      roleNames: {
         value:""
       },
       relevantUsers: {
@@ -236,6 +282,8 @@
         <option value="4">Get By Profile Key</option>
         <option value="5">Get Active Steps</option>
         <option value="6">Get Active Users</option>
+        <option value="7">Assign Role</option>
+        <option value="8">Get Assigned Roles</option>
       </select>
   </div>
   <div class="form-row" id="rowProfileKey">
@@ -265,6 +313,10 @@
   <div class="form-row" id="rowStepNames">
     <label for="node-input-stepNames"><i class="fa fa-edit"></i> Step Names {{m}}</label>
     <input type="text" id="node-input-stepNames" />
+  </div>
+  <div class="form-row" id="rowRoleNames">
+    <label for="node-input-roleNames"><i class="fa fa-edit"></i> Role Name(s) {{m}}</label>
+    <input type="text" id="node-input-roleNames" />
   </div>
   <div class="form-row" id="rowRelevantUsers">
     <label for="node-input-relevantUsers"><i class="fa fa-user"></i> Relevant Users {{m}}</label>
@@ -328,6 +380,7 @@
         <li><code>msg.agilite.bpm.bpmRecordIds</code>: String</li>
         <li><code>msg.agilite.bpm.responsibleUsers</code>: String</li>
         <li><code>msg.agilite.bpm.stepNames</code>: String</li>
+        <li><code>msg.agilite.bpm.roleNames</code>: String</li>
         <li><code>msg.agilite.bpm.relevantUsers</code>: String</li>
         <li><code>msg.agilite.bpm.profileKeys</code>: String</li>
     </ul>

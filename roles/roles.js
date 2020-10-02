@@ -6,7 +6,7 @@ module.exports = function (RED) {
   function Roles (config) {
     RED.nodes.createNode(this, config)
 
-    let node = this
+    const node = this
     let success = true
     let errorMessage = ''
 
@@ -20,22 +20,18 @@ module.exports = function (RED) {
     })
 
     this.on('input', function (msg) {
-      let serverConfig = RED.nodes.getNode(config.server)
+      const serverConfig = RED.nodes.getNode(config.server)
+      const url = serverConfig.server
+      const failFlow = config.failFlow
       let agilite = null
       let apiKey = ''
       let logProcessId = null
       let roleName = config.roleName
       let conditionalLevels = config.conditionalLevels
-      let processKey = config.processKey
-      let bpmRecordId = config.bpmRecordId
-      let currentUser = config.currentUser
-      let responsibleUsers = config.responsibleUsers
-      let url = serverConfig.server
       let data = {}
-      let failFlow = config.failFlow
 
       //  Function that is called inside .then of requests
-      let reqSuccess = function (response) {
+      const reqSuccess = function (response) {
         switch (node.fieldType) {
           case 'msg':
             RED.util.setMessageProperty(msg, node.field, response.data)
@@ -58,7 +54,7 @@ module.exports = function (RED) {
       }
 
       //  Function that is used inside the .catch of requests
-      let reqCatch = function (error) {
+      const reqCatch = function (error) {
         let errorMessage = ''
 
         if (error.response && error.response.data) {
@@ -117,30 +113,6 @@ module.exports = function (RED) {
               conditionalLevels = msg.agilite.roles.conditionalLevels
             }
           }
-
-          if (msg.agilite.roles.processKey) {
-            if (msg.agilite.roles.processKey !== '') {
-              processKey = msg.agilite.roles.processKey
-            }
-          }
-
-          if (msg.agilite.roles.bpmRecordId) {
-            if (msg.agilite.roles.bpmRecordId !== '') {
-              bpmRecordId = msg.agilite.roles.bpmRecordId
-            }
-          }
-
-          if (msg.agilite.roles.currentUser) {
-            if (msg.agilite.roles.currentUser !== '') {
-              currentUser = msg.agilite.roles.currentUser
-            }
-          }
-
-          if (msg.agilite.roles.responsibleUsers) {
-            if (msg.agilite.roles.responsibleUsers !== '') {
-              responsibleUsers = msg.agilite.roles.responsibleUsers
-            }
-          }
         }
       }
 
@@ -152,38 +124,13 @@ module.exports = function (RED) {
         roleName = config.roleName
       }
 
-      if (conditionalLevels === '') {
-        conditionalLevels = config.conditionalLevels
-      }
-
-      if (processKey === '') {
-        processKey = config.processKey
-      }
-
-      if (bpmRecordId === '') {
-        bpmRecordId = config.bpmRecordId
-      }
-
-      if (currentUser === '') {
-        currentUser = config.currentUser
-      }
-
-      if (responsibleUsers === '') {
-        responsibleUsers = config.responsibleUsers
-      }
-
       // Mustache
       roleName = Mustache.render(roleName, msg)
       conditionalLevels = Mustache.render(conditionalLevels, msg)
-      processKey = Mustache.render(processKey, msg)
-      bpmRecordId = Mustache.render(bpmRecordId, msg)
-      currentUser = Mustache.render(currentUser, msg)
-      responsibleUsers = Mustache.render(responsibleUsers, msg)
 
       //  Finalize array properties
       roleName = roleName.split(',')
       conditionalLevels = conditionalLevels.split(',')
-      responsibleUsers = responsibleUsers.split(',')
 
       // We need a apiKey, key and data to proceed
       if (apiKey === '') {
@@ -194,42 +141,10 @@ module.exports = function (RED) {
         errorMessage = 'No Server URL Provided'
       } else {
         switch (config.actionType) {
-          case '3': // Get Role
+          case '1': // Get Role
             if (roleName === '') {
               success = false
               errorMessage = 'No Role Name found'
-            }
-
-            break
-          case '2': // Get Assigned Roles
-            if (processKey === '') {
-              success = false
-              errorMessage = 'No BPM Process Key found'
-            } else if (bpmRecordId === '') {
-              success = false
-              errorMessage = 'No BPM Record Id found'
-            } else if (roleName === '') {
-              success = false
-              errorMessage = 'No Role Name found'
-            }
-
-            break
-          case '1': // Assign Role
-            if (processKey === '') {
-              success = false
-              errorMessage = 'No BPM Process Key found'
-            } else if (bpmRecordId === '') {
-              success = false
-              errorMessage = 'No BPM Record Id found'
-            } else if (roleName === '') {
-              success = false
-              errorMessage = 'No Role Name found'
-            } else if (currentUser === '') {
-              success = false
-              errorMessage = 'No Current User found'
-            } else if (responsibleUsers === '') {
-              success = false
-              errorMessage = 'No Responsible User(s) found'
             }
 
             break
@@ -265,18 +180,8 @@ module.exports = function (RED) {
       })
 
       switch (config.actionType) {
-        case '3': // Get Role
+        case '1': // Get Role
           agilite.Roles.getRole(roleName, conditionalLevels, data, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '2': // Get Assigned Roles
-          agilite.Roles.getAssignedRoles(processKey, bpmRecordId, roleName, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '1': // Assign Role
-          agilite.Roles.assignRole(processKey, bpmRecordId, roleName, currentUser, responsibleUsers, logProcessId)
             .then(reqSuccess)
             .catch(reqCatch)
           break
