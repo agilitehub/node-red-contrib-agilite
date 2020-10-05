@@ -321,27 +321,27 @@ module.exports = function (RED) {
       })
 
       //  Format Mustache properties
-      profileKey = Mustache.render(profileKey, msg)
-      currentUser = Mustache.render(currentUser, msg)
-      bpmRecordId = Mustache.render(bpmRecordId, msg)
-      optionSelected = Mustache.render(optionSelected, msg)
-      bpmRecordIds = Mustache.render(bpmRecordIds, msg)
-      responsibleUsers = Mustache.render(responsibleUsers, msg)
-      stepNames = Mustache.render(stepNames, msg)
-      roleNames = Mustache.render(roleNames, msg)
-      relevantUsers = Mustache.render(relevantUsers, msg)
-      profileKeys = Mustache.render(profileKeys, msg)
+      if (profileKey) profileKey = Mustache.render(profileKey, msg)
+      if (currentUser) currentUser = Mustache.render(currentUser, msg)
+      if (bpmRecordId) bpmRecordId = Mustache.render(bpmRecordId, msg)
+      if (optionSelected) optionSelected = Mustache.render(optionSelected, msg)
+      if (bpmRecordIds) bpmRecordIds = Mustache.render(bpmRecordIds, msg)
+      if (responsibleUsers) responsibleUsers = Mustache.render(responsibleUsers, msg)
+      if (stepNames) stepNames = Mustache.render(stepNames, msg)
+      if (roleNames) roleNames = Mustache.render(roleNames, msg)
+      if (relevantUsers) relevantUsers = Mustache.render(relevantUsers, msg)
+      if (profileKeys) profileKeys = Mustache.render(profileKeys, msg)
       if (page) page = Mustache.render(page, msg)
       if (pageLimit) pageLimit = Mustache.render(pageLimit, msg)
       if (sort) sort = Mustache.render(sort, msg)
 
       //  Finalize array properties
-      profileKeys = profileKeys.split(',')
-      bpmRecordIds = bpmRecordIds.split(',')
-      stepNames = stepNames.split(',')
-      roleNames = roleNames.split(',')
-      responsibleUsers = responsibleUsers.split(',')
-      relevantUsers = relevantUsers.split(',')
+      profileKeys ? profileKeys = profileKeys.split(',') : profileKeys = []
+      bpmRecordIds ? bpmRecordIds = bpmRecordIds.split(',') : bpmRecordIds = []
+      stepNames ? stepNames = stepNames.split(',') : stepNames = []
+      roleNames ? roleNames = roleNames.split(',') : roleNames = []
+      responsibleUsers ? responsibleUsers = responsibleUsers.split(',') : responsibleUsers = []
+      relevantUsers? relevantUsers = relevantUsers.split(',') : relevantUsers = []
 
       // Create msg.agilite if it's null so we can store the result
       if (!msg.agilite) {
