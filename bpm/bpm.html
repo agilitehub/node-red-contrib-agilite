@@ -21,6 +21,7 @@
             document.querySelector("#rowPageLimit").style.display = "none";
             document.querySelector("#rowSort").style.display = "none";
             document.querySelector("#rowRoleNames").style.display = "none"; 
+            document.querySelector("#rowISOLanguage").style.display = "block"; 
             break;
           case "2"://Execute
             document.querySelector("#rowProfileKey").style.display = "block";
@@ -38,7 +39,8 @@
             document.querySelector("#rowPage").style.display = "none"; 
             document.querySelector("#rowPageLimit").style.display = "none";
             document.querySelector("#rowSort").style.display = "none"; 
-            document.querySelector("#rowRoleNames").style.display = "none"; 
+            document.querySelector("#rowRoleNames").style.display = "none";
+            document.querySelector("#rowISOLanguage").style.display = "block"; 
             break;
           case "3"://Get Record State
             document.querySelector("#rowProfileKey").style.display = "none";
@@ -57,7 +59,8 @@
             document.querySelector("#rowPage").style.display = "block"; 
             document.querySelector("#rowPageLimit").style.display = "block";
             document.querySelector("#rowSort").style.display = "block";
-            document.querySelector("#rowRoleNames").style.display = "none"; 
+            document.querySelector("#rowRoleNames").style.display = "none";
+            document.querySelector("#rowISOLanguage").style.display = "block"; 
             break;
           case "4"://Get By Profile Key
             document.querySelector("#rowProfileKey").style.display = "block";
@@ -75,7 +78,8 @@
             document.querySelector("#rowPage").style.display = "none"; 
             document.querySelector("#rowPageLimit").style.display = "none";
             document.querySelector("#rowSort").style.display = "none";
-            document.querySelector("#rowRoleNames").style.display = "none"; 
+            document.querySelector("#rowRoleNames").style.display = "none";
+            document.querySelector("#rowISOLanguage").style.display = "none"; 
             break;
           case "5"://Get Active Steps
             document.querySelector("#rowProfileKey").style.display = "block";
@@ -93,7 +97,8 @@
             document.querySelector("#rowPage").style.display = "none"; 
             document.querySelector("#rowPageLimit").style.display = "none";
             document.querySelector("#rowSort").style.display = "none";
-            document.querySelector("#rowRoleNames").style.display = "none"; 
+            document.querySelector("#rowRoleNames").style.display = "none";
+            document.querySelector("#rowISOLanguage").style.display = "block"; 
             break;
           case "6"://Get Active Users
             document.querySelector("#rowProfileKey").style.display = "block";
@@ -111,7 +116,8 @@
             document.querySelector("#rowPage").style.display = "none"; 
             document.querySelector("#rowPageLimit").style.display = "none";
             document.querySelector("#rowSort").style.display = "none";
-            document.querySelector("#rowRoleNames").style.display = "none"; 
+            document.querySelector("#rowRoleNames").style.display = "none";
+            document.querySelector("#rowISOLanguage").style.display = "none";  
           break;
           case "7": // Assign Role
             document.querySelector("#rowProfileKey").style.display = "block";
@@ -129,7 +135,8 @@
             document.querySelector("#rowPage").style.display = "none"; 
             document.querySelector("#rowPageLimit").style.display = "none";
             document.querySelector("#rowSort").style.display = "none";
-            document.querySelector("#rowRoleNames").style.display = "block"; 
+            document.querySelector("#rowRoleNames").style.display = "block";
+            document.querySelector("#rowISOLanguage").style.display = "none"; 
           break;
           case "8": // Get Assigned Roles
             document.querySelector("#rowProfileKey").style.display = "block";
@@ -147,7 +154,8 @@
             document.querySelector("#rowPage").style.display = "none"; 
             document.querySelector("#rowPageLimit").style.display = "none";
             document.querySelector("#rowSort").style.display = "none";
-            document.querySelector("#rowRoleNames").style.display = "block"; 
+            document.querySelector("#rowRoleNames").style.display = "block";
+            document.querySelector("#rowISOLanguage").style.display = "none"; 
           break;
           default:
             document.querySelector("#rowProfileKey").style.display = "none";
@@ -165,7 +173,8 @@
             document.querySelector("#rowPage").style.display = "none"; 
             document.querySelector("#rowPageLimit").style.display = "none";
             document.querySelector("#rowSort").style.display = "none";
-            document.querySelector("#rowRoleNames").style.display = "none"; 
+            document.querySelector("#rowRoleNames").style.display = "none";
+            document.querySelector("#rowISOLanguage").style.display = "none"; 
             break;
         }
     }
@@ -228,6 +237,9 @@
         value: true
       },
       profileKeys: {
+        value:""
+      },
+      isoLanguage: {
         value:""
       },
       page: {
@@ -325,6 +337,10 @@
   <div class="form-row" id="rowProfileKeys">
     <label for="node-input-profileKeys"><i class="fa fa-key"></i> Profile Keys {{m}}</label>
     <input type="text" id="node-input-profileKeys" />
+  </div>
+  <div class="form-row" id="rowISOLanguage">
+    <label for="node-input-isoLanguage"><i class="fa fa-key"></i> ISO Language {{m}}</label>
+    <input type="text" id="node-input-isoLanguage" />
   </div>
   <div class="form-row" id="rowPage">
     <label for="node-input-page"><i class="fa fa-key"></i> Page {{m}}</label>

@@ -40,6 +40,7 @@ module.exports = function (RED) {
       let roleNames = config.roleNames
       let relevantUsers = config.relevantUsers
       let profileKeys = config.profileKeys
+      let isoLanguage = config.isoLanguage
       let page = config.page
       let pageLimit = config.pageLimit
       let sort = config.sort
@@ -176,6 +177,12 @@ module.exports = function (RED) {
           if (msg.agilite.bpm.profileKeys) {
             if (msg.agilite.bpm.profileKeys !== '') {
               profileKeys = msg.agilite.bpm.profileKeys
+            }
+          }
+
+          if (msg.agilite.bpm.isoLanguage) {
+            if (msg.agilite.bpm.isoLanguage !== '') {
+              isoLanguage = msg.agilite.bpm.isoLanguage
             }
           }
 
@@ -331,6 +338,7 @@ module.exports = function (RED) {
       if (roleNames) roleNames = Mustache.render(roleNames, msg)
       if (relevantUsers) relevantUsers = Mustache.render(relevantUsers, msg)
       if (profileKeys) profileKeys = Mustache.render(profileKeys, msg)
+      if (isoLanguage) isoLanguage = Mustache.render(isoLanguage, msg)
       if (page) page = Mustache.render(page, msg)
       if (pageLimit) pageLimit = Mustache.render(pageLimit, msg)
       if (sort) sort = Mustache.render(sort, msg)
@@ -356,17 +364,17 @@ module.exports = function (RED) {
 
       switch (config.actionType) {
         case '1': // Register BPM Record
-          agilite.BPM.registerBPMRecord(profileKey, currentUser, logProcessId)
+          agilite.BPM.registerBPMRecord(profileKey, currentUser, isoLanguage, logProcessId)
             .then(reqSuccess)
             .catch(reqCatch)
           break
         case '2': // Execute
-          agilite.BPM.execute(profileKey, bpmRecordId, optionSelected, currentUser, comments, data, logProcessId)
+          agilite.BPM.execute(profileKey, bpmRecordId, optionSelected, currentUser, comments, data, isoLanguage, logProcessId)
             .then(reqSuccess)
             .catch(reqCatch)
           break
         case '3': // Get Record State
-          agilite.BPM.getRecordState(profileKeys, bpmRecordIds, stepNames, responsibleUsers, relevantUsers, history, stepOptions, visibleObjects, page, pageLimit, sort, logProcessId)
+          agilite.BPM.getRecordState(profileKeys, bpmRecordIds, stepNames, responsibleUsers, relevantUsers, history, stepOptions, visibleObjects, page, pageLimit, sort, isoLanguage, logProcessId)
             .then(reqSuccess)
             .catch(reqCatch)
           break
@@ -376,7 +384,7 @@ module.exports = function (RED) {
             .catch(reqCatch)
           break
         case '5': // Get Active Steps
-          agilite.BPM.getActiveSteps(profileKey, logProcessId)
+          agilite.BPM.getActiveSteps(profileKey, isoLanguage, logProcessId)
             .then(reqSuccess)
             .catch(reqCatch)
           break
