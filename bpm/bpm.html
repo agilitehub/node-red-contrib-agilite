@@ -7,6 +7,7 @@
           case "1"://Register BPM Record
             document.querySelector("#rowProfileKey").style.display = "block";
             document.querySelector("#rowCurrentUser").style.display = "block";
+            document.querySelector("#rowCurrentStep").style.display = "none";
             document.querySelector("#rowBpmRecordId").style.display = "none";
             document.querySelector("#rowOptionSelected").style.display = "none";
             document.querySelector("#rowBpmRecordIds").style.display = "none";
@@ -26,6 +27,7 @@
           case "2"://Execute
             document.querySelector("#rowProfileKey").style.display = "block";
             document.querySelector("#rowCurrentUser").style.display = "block";
+            document.querySelector("#rowCurrentStep").style.display = "block";
             document.querySelector("#rowBpmRecordId").style.display = "block";
             document.querySelector("#rowOptionSelected").style.display = "block";
             document.querySelector("#rowBpmRecordIds").style.display = "none";
@@ -45,6 +47,7 @@
           case "3"://Get Record State
             document.querySelector("#rowProfileKey").style.display = "none";
             document.querySelector("#rowCurrentUser").style.display = "none";
+            document.querySelector("#rowCurrentStep").style.display = "none";
             document.querySelector("#rowBpmRecordId").style.display = "none";
             document.querySelector("#rowOptionSelected").style.display = "none";
             document.querySelector("#rowBpmRecordIds").style.display = "block";
@@ -65,6 +68,7 @@
           case "4"://Get By Profile Key
             document.querySelector("#rowProfileKey").style.display = "block";
             document.querySelector("#rowCurrentUser").style.display = "none";
+            document.querySelector("#rowCurrentStep").style.display = "none";
             document.querySelector("#rowBpmRecordId").style.display = "none";
             document.querySelector("#rowOptionSelected").style.display = "none";
             document.querySelector("#rowBpmRecordIds").style.display = "none";
@@ -84,6 +88,7 @@
           case "5"://Get Active Steps
             document.querySelector("#rowProfileKey").style.display = "block";
             document.querySelector("#rowCurrentUser").style.display = "none";
+            document.querySelector("#rowCurrentStep").style.display = "none";
             document.querySelector("#rowBpmRecordId").style.display = "none";
             document.querySelector("#rowOptionSelected").style.display = "none";
             document.querySelector("#rowBpmRecordIds").style.display = "none";
@@ -103,6 +108,7 @@
           case "6"://Get Active Users
             document.querySelector("#rowProfileKey").style.display = "block";
             document.querySelector("#rowCurrentUser").style.display = "none";
+            document.querySelector("#rowCurrentStep").style.display = "none";
             document.querySelector("#rowBpmRecordId").style.display = "none";
             document.querySelector("#rowOptionSelected").style.display = "none";
             document.querySelector("#rowBpmRecordIds").style.display = "none";
@@ -122,6 +128,7 @@
           case "7": // Assign Role
             document.querySelector("#rowProfileKey").style.display = "block";
             document.querySelector("#rowCurrentUser").style.display = "block";
+            document.querySelector("#rowCurrentStep").style.display = "none";
             document.querySelector("#rowBpmRecordId").style.display = "block";
             document.querySelector("#rowOptionSelected").style.display = "none";
             document.querySelector("#rowBpmRecordIds").style.display = "none";
@@ -141,6 +148,7 @@
           case "8": // Get Assigned Roles
             document.querySelector("#rowProfileKey").style.display = "block";
             document.querySelector("#rowCurrentUser").style.display = "none";
+            document.querySelector("#rowCurrentStep").style.display = "none";
             document.querySelector("#rowBpmRecordId").style.display = "block";
             document.querySelector("#rowOptionSelected").style.display = "none";
             document.querySelector("#rowBpmRecordIds").style.display = "none";
@@ -160,6 +168,7 @@
           default:
             document.querySelector("#rowProfileKey").style.display = "none";
             document.querySelector("#rowCurrentUser").style.display = "none";
+            document.querySelector("#rowCurrentStep").style.display = "none";
             document.querySelector("#rowBpmRecordId").style.display = "none";
             document.querySelector("#rowOptionSelected").style.display = "none";
             document.querySelector("#rowBpmRecordIds").style.display = "none";
@@ -205,6 +214,9 @@
       },
       currentUser: {
         value : ""
+      },
+      currentStep: {
+        value: ""
       },
       bpmRecordId: {
         value : ""
@@ -305,6 +317,10 @@
   <div class="form-row" id="rowCurrentUser">
     <label for="node-input-currentUser"><i class="fa fa-user"></i> Current User {{m}}</label>
     <input type="text" id="node-input-currentUser" />
+  </div>
+  <div class="form-row" id="rowCurrentStep">
+    <label for="node-input-currentStep"> Current Step {{m}}</label>
+    <input type="text" id="node-input-currentStep" />
   </div>
   <div class="form-row" id="rowBpmRecordId">
     <label for="node-input-bpmRecordId"><i class="fa fa-edit"></i> BPM Record Id {{m}}</label>

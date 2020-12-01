@@ -32,6 +32,7 @@ module.exports = function (RED) {
       let logProcessId = null
       let profileKey = config.profileKey
       let currentUser = config.currentUser
+      let currentStep = config.currentStep
       let bpmRecordId = config.bpmRecordId
       let optionSelected = config.optionSelected
       let bpmRecordIds = config.bpmRecordIds
@@ -129,6 +130,12 @@ module.exports = function (RED) {
           if (msg.agilite.bpm.currentUser) {
             if (msg.agilite.bpm.currentUser !== '') {
               currentUser = msg.agilite.bpm.currentUser
+            }
+          }
+
+          if (msg.agilite.bpm.currentStep) {
+            if (msg.agilite.bpm.currentStep !== '') {
+              currentStep = msg.agilite.bpm.currentStep
             }
           }
 
@@ -252,6 +259,11 @@ module.exports = function (RED) {
               errorMessage = 'No Current User found'
             }
 
+            if (currentStep === '') {
+              success = false
+              errorMessage = 'No Current Step found'
+            }
+
             break
           case '3': // Get Record State
             if (profileKeys === '') {
@@ -330,6 +342,7 @@ module.exports = function (RED) {
       //  Format Mustache properties
       if (profileKey) profileKey = Mustache.render(profileKey, msg)
       if (currentUser) currentUser = Mustache.render(currentUser, msg)
+      if (currentStep) currentStep = Mustache.render(currentStep, msg)
       if (bpmRecordId) bpmRecordId = Mustache.render(bpmRecordId, msg)
       if (optionSelected) optionSelected = Mustache.render(optionSelected, msg)
       if (bpmRecordIds) bpmRecordIds = Mustache.render(bpmRecordIds, msg)
@@ -369,7 +382,7 @@ module.exports = function (RED) {
             .catch(reqCatch)
           break
         case '2': // Execute
-          agilite.BPM.execute(profileKey, bpmRecordId, optionSelected, currentUser, comments, data, isoLanguage, logProcessId)
+          agilite.BPM.execute(profileKey, bpmRecordId, optionSelected, currentUser, currentStep, comments, data, isoLanguage, logProcessId)
             .then(reqSuccess)
             .catch(reqCatch)
           break
