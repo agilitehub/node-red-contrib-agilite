@@ -26,11 +26,7 @@
     }
   ],
   "dependencies": {
-<<<<<<< HEAD
     "agilite": "7.2.3",
-=======
-    "agilite": "7.2.2",
->>>>>>> b84141d9add0199c9ede6df30ad921c78a242b79
     "axios": "0.21.0"
   },
   "keywords": [
