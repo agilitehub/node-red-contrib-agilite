@@ -40,6 +40,11 @@ module.exports = function (RED) {
       let stepNames = config.stepNames
       let roleNames = config.roleNames
       let relevantUsers = config.relevantUsers
+      let relevantRoles = config.relevantRoles
+      let eventStamps = config.eventStamps
+      let includeKeywords = config.includeKeywords
+      let eventStartDate = config.eventStartDate
+      let eventEndDate = config.eventEndDate
       let profileKeys = config.profileKeys
       let isoLanguage = config.isoLanguage
       let page = config.page
@@ -205,6 +210,30 @@ module.exports = function (RED) {
             }
           }
 
+          if (msg.agilite.bpm.relevantRoles) {
+            if (msg.agilite.bpm.relevantRoles !== '') {
+              relevantRoles = msg.agilite.bpm.relevantRoles
+            }
+          }
+
+          if (msg.agilite.bpm.eventStartDate) {
+            if (msg.agilite.bpm.eventStartDate !== '') {
+              eventStartDate = msg.agilite.bpm.eventStartDate
+            }
+          }
+
+          if (msg.agilite.bpm.eventEndDate) {
+            if (msg.agilite.bpm.eventEndDate !== '') {
+              eventEndDate = msg.agilite.bpm.eventEndDate
+            }
+          }
+
+          if (msg.agilite.bpm.eventStamps) {
+            if (msg.agilite.bpm.eventStamps !== '') {
+              eventStamps = msg.agilite.bpm.eventStamps
+            }
+          }
+
           if (msg.agilite.bpm.sort) {
             if (msg.agilite.bpm.sort !== '') {
               sort = msg.agilite.bpm.sort
@@ -354,6 +383,10 @@ module.exports = function (RED) {
       if (isoLanguage) isoLanguage = Mustache.render(isoLanguage, msg)
       if (page) page = Mustache.render(page, msg)
       if (pageLimit) pageLimit = Mustache.render(pageLimit, msg)
+      if (relevantRoles) relevantRoles = Mustache.render(relevantRoles, msg)
+      if (eventStartDate) eventStartDate = Mustache.render(eventStartDate, msg)
+      if (eventEndDate) eventEndDate = Mustache.render(eventEndDate, msg)
+      if (eventStamps) eventStamps = Mustache.render(eventStamps, msg)
       if (sort) sort = Mustache.render(sort, msg)
 
       //  Finalize array properties
@@ -362,7 +395,9 @@ module.exports = function (RED) {
       stepNames ? stepNames = stepNames.split(',') : stepNames = []
       roleNames ? roleNames = roleNames.split(',') : roleNames = []
       responsibleUsers ? responsibleUsers = responsibleUsers.split(',') : responsibleUsers = []
-      relevantUsers? relevantUsers = relevantUsers.split(',') : relevantUsers = []
+      relevantUsers ? relevantUsers = relevantUsers.split(',') : relevantUsers = []
+      relevantRoles ? relevantRoles = relevantRoles.split(',') : relevantRoles = []
+      eventStamps ? eventStamps = eventStamps.split(',') : eventStamps = []
 
       // Create msg.agilite if it's null so we can store the result
       if (!msg.agilite) {
@@ -387,7 +422,7 @@ module.exports = function (RED) {
             .catch(reqCatch)
           break
         case '3': // Get Record State
-          agilite.BPM.getRecordState(profileKeys, bpmRecordIds, stepNames, responsibleUsers, relevantUsers, history, stepOptions, visibleObjects, page, pageLimit, sort, isoLanguage, logProcessId)
+          agilite.BPM.getRecordState(profileKeys, bpmRecordIds, stepNames, responsibleUsers, relevantUsers, relevantRoles, eventStamps, eventStartDate, eventEndDate, history, stepOptions, visibleObjects, includeKeywords, page, pageLimit, sort, isoLanguage, logProcessId)
             .then(reqSuccess)
             .catch(reqCatch)
           break

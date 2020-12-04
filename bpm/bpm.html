@@ -22,7 +22,12 @@
             document.querySelector("#rowPageLimit").style.display = "none";
             document.querySelector("#rowSort").style.display = "none";
             document.querySelector("#rowRoleNames").style.display = "none"; 
-            document.querySelector("#rowISOLanguage").style.display = "block"; 
+            document.querySelector("#rowISOLanguage").style.display = "block";
+            document.querySelector("#rowRelevantRoles").style.display = "none";
+            document.querySelector("#rowEventStamps").style.display = "none";
+            document.querySelector("#rowIncludeKeywords").style.display = "none";
+            document.querySelector("#rowEventStartDate").style.display = "none";
+            document.querySelector("#rowEventEndDate").style.display = "none";
             break;
           case "2"://Execute
             document.querySelector("#rowProfileKey").style.display = "block";
@@ -43,6 +48,11 @@
             document.querySelector("#rowSort").style.display = "none"; 
             document.querySelector("#rowRoleNames").style.display = "none";
             document.querySelector("#rowISOLanguage").style.display = "block"; 
+            document.querySelector("#rowRelevantRoles").style.display = "none";
+            document.querySelector("#rowEventStamps").style.display = "none";
+            document.querySelector("#rowIncludeKeywords").style.display = "none";
+            document.querySelector("#rowEventStartDate").style.display = "none";
+            document.querySelector("#rowEventEndDate").style.display = "none";
             break;
           case "3"://Get Record State
             document.querySelector("#rowProfileKey").style.display = "none";
@@ -64,6 +74,11 @@
             document.querySelector("#rowSort").style.display = "block";
             document.querySelector("#rowRoleNames").style.display = "none";
             document.querySelector("#rowISOLanguage").style.display = "block"; 
+            document.querySelector("#rowRelevantRoles").style.display = "block";
+            document.querySelector("#rowEventStamps").style.display = "block";
+            document.querySelector("#rowIncludeKeywords").style.display = "block";
+            document.querySelector("#rowEventStartDate").style.display = "block";
+            document.querySelector("#rowEventEndDate").style.display = "block";
             break;
           case "4"://Get By Profile Key
             document.querySelector("#rowProfileKey").style.display = "block";
@@ -83,7 +98,12 @@
             document.querySelector("#rowPageLimit").style.display = "none";
             document.querySelector("#rowSort").style.display = "none";
             document.querySelector("#rowRoleNames").style.display = "none";
-            document.querySelector("#rowISOLanguage").style.display = "none"; 
+            document.querySelector("#rowISOLanguage").style.display = "none";
+            document.querySelector("#rowRelevantRoles").style.display = "none";
+            document.querySelector("#rowEventStamps").style.display = "none";
+            document.querySelector("#rowIncludeKeywords").style.display = "none";
+            document.querySelector("#rowEventStartDate").style.display = "none";
+            document.querySelector("#rowEventEndDate").style.display = "none";
             break;
           case "5"://Get Active Steps
             document.querySelector("#rowProfileKey").style.display = "block";
@@ -104,6 +124,11 @@
             document.querySelector("#rowSort").style.display = "none";
             document.querySelector("#rowRoleNames").style.display = "none";
             document.querySelector("#rowISOLanguage").style.display = "block"; 
+            document.querySelector("#rowRelevantRoles").style.display = "none";
+            document.querySelector("#rowEventStamps").style.display = "none";
+            document.querySelector("#rowIncludeKeywords").style.display = "none";
+            document.querySelector("#rowEventStartDate").style.display = "none";
+            document.querySelector("#rowEventEndDate").style.display = "none";
             break;
           case "6"://Get Active Users
             document.querySelector("#rowProfileKey").style.display = "block";
@@ -124,6 +149,11 @@
             document.querySelector("#rowSort").style.display = "none";
             document.querySelector("#rowRoleNames").style.display = "none";
             document.querySelector("#rowISOLanguage").style.display = "none";  
+            document.querySelector("#rowRelevantRoles").style.display = "none";
+            document.querySelector("#rowEventStamps").style.display = "none";
+            document.querySelector("#rowIncludeKeywords").style.display = "none";
+            document.querySelector("#rowEventStartDate").style.display = "none";
+            document.querySelector("#rowEventEndDate").style.display = "none";
           break;
           case "7": // Assign Role
             document.querySelector("#rowProfileKey").style.display = "block";
@@ -144,6 +174,11 @@
             document.querySelector("#rowSort").style.display = "none";
             document.querySelector("#rowRoleNames").style.display = "block";
             document.querySelector("#rowISOLanguage").style.display = "none"; 
+            document.querySelector("#rowRelevantRoles").style.display = "none";
+            document.querySelector("#rowEventStamps").style.display = "none";
+            document.querySelector("#rowIncludeKeywords").style.display = "none";
+            document.querySelector("#rowEventStartDate").style.display = "none";
+            document.querySelector("#rowEventEndDate").style.display = "none";
           break;
           case "8": // Get Assigned Roles
             document.querySelector("#rowProfileKey").style.display = "block";
@@ -164,6 +199,11 @@
             document.querySelector("#rowSort").style.display = "none";
             document.querySelector("#rowRoleNames").style.display = "block";
             document.querySelector("#rowISOLanguage").style.display = "none"; 
+            document.querySelector("#rowRelevantRoles").style.display = "none";
+            document.querySelector("#rowEventStamps").style.display = "none";
+            document.querySelector("#rowIncludeKeywords").style.display = "none";
+            document.querySelector("#rowEventStartDate").style.display = "none";
+            document.querySelector("#rowEventEndDate").style.display = "none";
           break;
           default:
             document.querySelector("#rowProfileKey").style.display = "none";
@@ -184,6 +224,11 @@
             document.querySelector("#rowSort").style.display = "none";
             document.querySelector("#rowRoleNames").style.display = "none";
             document.querySelector("#rowISOLanguage").style.display = "none"; 
+            document.querySelector("#rowRelevantRoles").style.display = "none";
+            document.querySelector("#rowEventStamps").style.display = "none";
+            document.querySelector("#rowIncludeKeywords").style.display = "none";
+            document.querySelector("#rowEventStartDate").style.display = "none";
+            document.querySelector("#rowEventEndDate").style.display = "none";
             break;
         }
     }
@@ -264,6 +309,21 @@
         value:""
       },
       name: {
+        value:""
+      },
+      relevantRoles: {
+        value:""
+      },
+      eventStamps: {
+        value:""
+      },
+      includeKeywords: {
+        value:true
+      },
+      eventStartDate: {
+        value:""
+      },
+      eventEndDate: {
         value:""
       },
       field: {
@@ -354,6 +414,22 @@
     <label for="node-input-profileKeys"><i class="fa fa-key"></i> Profile Keys {{m}}</label>
     <input type="text" id="node-input-profileKeys" />
   </div>
+  <div class="form-row" id="rowRelevantRoles">
+    <label for="node-input-relevantRoles"> Relevant Roles {{m}}</label>
+    <input type="text" id="node-input-relevantRoles" />
+  </div>
+  <div class="form-row" id="rowEventStamps">
+    <label for="node-input-eventStamps"> Event Stamps {{m}}</label>
+    <input type="text" id="node-input-eventStamps" />
+  </div>
+  <div class="form-row" id="rowEventStartDate">
+    <label for="node-input-eventStartDate"> Event Start Date {{m}}</label>
+    <input type="text" id="node-input-eventStartDate" />
+  </div>
+  <div class="form-row" id="rowEventEndDate">
+    <label for="node-input-eventEndDate"> Event End Date {{m}}</label>
+    <input type="text" id="node-input-eventEndDate" />
+  </div>
   <div class="form-row" id="rowISOLanguage">
     <label for="node-input-isoLanguage">ISO Language {{m}}</label>
     <input type="text" id="node-input-isoLanguage" />
@@ -381,6 +457,10 @@
   <div class="form-row" id="rowExcludeVisibleObjects">
     <label for="node-input-excludeVisibleObjects"><span data-i18n="template.label.property">Include Visible Objects</span></label>
     <input type="checkbox" id="node-input-excludeVisibleObjects" style="width:initial;" /> Yes
+  </div>
+  <div class="form-row" id="rowIncludeKeywords">
+    <label for="node-input-includeKeywords"><span data-i18n="template.label.property">Include Keywords</span></label>
+    <input type="checkbox" id="node-input-includeKeywords" style="width:initial;" /> Yes
   </div>
   <div class="form-row">
         <label for="node-input-field"><i class="fa fa-edit"></i> <span data-i18n="template.label.property">Output to</span></label>
