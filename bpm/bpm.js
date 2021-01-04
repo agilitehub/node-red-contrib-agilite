@@ -412,12 +412,12 @@ module.exports = function (RED) {
 
       switch (config.actionType) {
         case '1': // Register BPM Record
-          agilite.BPM.registerBPMRecord(profileKey, currentUser, isoLanguage, logProcessId)
+          agilite.BPM.registerBPMRecord(profileKey, currentUser, history, stepOptions, visibleObjects, includeKeywords, isoLanguage, logProcessId)
             .then(reqSuccess)
             .catch(reqCatch)
           break
         case '2': // Execute
-          agilite.BPM.execute(profileKey, bpmRecordId, optionSelected, currentUser, currentStep, comments, data, isoLanguage, logProcessId)
+          agilite.BPM.execute(profileKey, bpmRecordId, optionSelected, currentUser, currentStep, comments, data, history, stepOptions, visibleObjects, includeKeywords, isoLanguage, logProcessId)
             .then(reqSuccess)
             .catch(reqCatch)
           break
@@ -448,6 +448,16 @@ module.exports = function (RED) {
           break
         case '8': // Get Assigned Roles
           agilite.BPM.getAssignedRoles(profileKey, bpmRecordId, roleNames, logProcessId)
+            .then(reqSuccess)
+            .catch(reqCatch)
+          break
+        case '9': // Lock Record
+          agilite.BPM.lockRecord(bpmRecordId, logProcessId)
+            .then(reqSuccess)
+            .catch(reqCatch)
+          break
+        case '10': // Unlock Record
+          agilite.BPM.unlockRecord(bpmRecordId, logProcessId)
             .then(reqSuccess)
             .catch(reqCatch)
           break
