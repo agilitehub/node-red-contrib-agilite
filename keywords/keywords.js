@@ -1,10 +1,10 @@
 const Agilite = require('agilite')
 
-module.exports = function (RED) {
+module.exports = (RED) => {
   function Keywords (config) {
     RED.nodes.createNode(this, config)
 
-    let node = this
+    const node = this
     let success = true
     let errorMessage = ''
     this.field = config.field || 'payload'
@@ -19,8 +19,10 @@ module.exports = function (RED) {
       shape: 'ring'
     })
 
-    this.on('input', function (msg) {
-      let serverConfig = RED.nodes.getNode(config.server)
+    this.on('input', async (msg) => {
+      const serverConfig = RED.nodes.getNode(config.server)
+      const failFlow = config.failFlow
+      const outputFormat2 = config.outputFormat2
       let apiKey = ''
       let logProcessId = null
       let recordId = config.recordId
@@ -30,59 +32,45 @@ module.exports = function (RED) {
       let valueKey = config.valueKey
       let sortBy = config.sortBy
       let sortBy2 = config.sortBy2
+      let values = config.values
+      let profileKeys = config.profileKeys
+      let recordIds = config.recordIds
       let outputFormat = config.outputFormat
-      let outputFormat2 = config.outputFormat2
       let url = ''
       let data = {}
-      let failFlow = config.failFlow
 
-      //  Function that is called inside .then of requests
-      let reqSuccess = function (response) {
-        if (response.status === 200) {
-          switch (node.fieldType) {
-            case 'msg':
-              RED.util.setMessageProperty(msg, node.field, response.data)
-              break
-            case 'flow':
-              node.context().flow.set(node.field, response.data)
-              break
-            case 'global':
-              node.context().global.set(node.field, response.data)
-              break
-          }
-
-          node.status({
-            fill: 'green',
-            text: 'Success',
-            shape: 'ring'
-          })
-
-          node.send(msg)
-        } else {
-          msg.payload = {}
-
-          node.status({
-            fill: 'red',
-            text: 'Error',
-            shape: 'ring'
-          })
-
-          if (failFlow) {
-            node.error(msg.agilite.message, msg)
-          } else {
-            node.send(msg)
-          }
+      const reqSuccess = (response) => {
+        switch (node.fieldType) {
+          case 'msg':
+            RED.util.setMessageProperty(msg, node.field, response.data)
+            break
+          case 'flow':
+            node.context().flow.set(node.field, response.data)
+            break
+          case 'global':
+            node.context().global.set(node.field, response.data)
+            break
         }
+
+        node.status({
+          fill: 'green',
+          text: 'Success',
+          shape: 'ring'
+        })
+
+        node.send(msg)
       }
 
-      //  Function that is used inside the .catch of requests
-      let reqCatch = function (error) {
+      const reqCatch = (error) => {
+        let errMsg = null
         msg.payload = {}
 
-        if (error.response && error.response.data) {
-          msg.agilite.message = error.response.data.errorMessage
+        if (error.response.data.errorMessage) {
+          errMsg = error.response.data.errorMessage
+        } else if (error.message) {
+          errMsg = error.message
         } else {
-          msg.agilite.message = 'Unknown Error Occurred'
+          errMsg = 'Unknown Error Occurred'
         }
 
         node.status({
@@ -92,130 +80,64 @@ module.exports = function (RED) {
         })
 
         if (failFlow) {
-          node.error(msg.agilite.message, msg)
+          node.error(errMsg, msg)
         } else {
           node.send(msg)
         }
       }
-
-      url = serverConfig.server
 
       // Check if there's valid data to pass
       if (typeDetect(msg.payload) !== 'Object') {
         msg.payload = {}
       }
 
-      data = msg.payload
-
-      // Check if we need to use programmatic values
-      if (msg.agilite) {
-        if (msg.agilite.apiKey) {
-          if (msg.agilite.apiKey !== '') {
-            apiKey = msg.agilite.apiKey
-          }
-        }
-
-        if (msg.agilite.logProcessId) {
-          if (msg.agilite.logProcessId !== '') {
-            logProcessId = msg.agilite.logProcessId
-          }
-        }
-
-        if (msg.agilite.keywords) {
-          if (msg.agilite.keywords.recordId) {
-            if (msg.agilite.keywords.recordId !== '') {
-              recordId = msg.agilite.keywords.recordId
-            }
-          }
-
-          if (msg.agilite.keywords.profileKey) {
-            if (msg.agilite.keywords.profileKey !== '') {
-              profileKey = msg.agilite.keywords.profileKey
-            }
-          }
-
-          if (msg.agilite.keywords.groupName) {
-            if (msg.agilite.keywords.groupName !== '') {
-              groupName = msg.agilite.keywords.groupName
-            }
-          }
-
-          if (msg.agilite.keywords.labelKey) {
-            if (msg.agilite.keywords.labelKey !== '') {
-              labelKey = msg.agilite.keywords.labelKey
-            }
-          }
-
-          if (msg.agilite.keywords.valueKey) {
-            if (msg.agilite.keywords.valueKey !== '') {
-              valueKey = msg.agilite.keywords.valueKey
-            }
-          }
-
-          if (msg.agilite.keywords.sortBy) {
-            if (msg.agilite.keywords.sortBy !== '') {
-              sortBy = msg.agilite.keywords.sortBy
-            }
-          }
-
-          if (msg.agilite.keywords.sortBy2) {
-            if (msg.agilite.keywords.sortBy2 !== '') {
-              sortBy2 = msg.agilite.keywords.sortBy2
-            }
-          }
-
-          if (msg.agilite.keywords.outputFormat) {
-            if (msg.agilite.keywords.outputFormat !== '') {
-              outputFormat = msg.agilite.keywords.outputFormat
-            }
-          }
-        }
-      }
-
-      if (apiKey === '') {
+      if (!apiKey) {
         apiKey = serverConfig.credentials.apiKey
       }
 
+      url = serverConfig.server
+      data = msg.payload
+
       // We need a apiKey, key and data to proceed
-      if (apiKey === '') {
+      if (!apiKey) {
         success = false
         errorMessage = 'No valid API Key Provided. Please authenticate with Agilit-e first'
-      } else if (url === '') {
+      } else if (!url) {
         success = false
         errorMessage = 'No Server URL Provided'
       } else {
         switch (config.actionType) {
           case '1': // Get Keywords By Profile Key
-            if (profileKey === '') {
+            if (!profileKey) {
               success = false
-              errorMessage = 'No Profile Key found'
+              errorMessage = 'Please provide a Profile Key'
             }
 
             break
           case '2': // Get Profile Keys By Group
-            if (groupName === '') {
+            if (!groupName) {
               success = false
-              errorMessage = 'No Group Name found'
+              errorMessage = 'Please provide a Group Name'
             }
 
             break
           case '3': // Get Keyword Value by Label
-            if (profileKey === '') {
+            if (!profileKey) {
               success = false
-              errorMessage = 'No Profile Key found'
-            } else if (labelKey === '') {
+              errorMessage = 'Please provide a Profile Key'
+            } else if (!labelKey) {
               success = false
-              errorMessage = 'No Label Key found'
+              errorMessage = 'Please provide a Label Key'
             }
 
             break
           case '4': // Get Keyword Label by Value
-            if (profileKey === '') {
+            if (!profileKey) {
               success = false
-              errorMessage = 'No Profile Key found'
-            } else if (valueKey === '') {
+              errorMessage = 'Please provide a Profile Key'
+            } else if (!valueKey) {
               success = false
-              errorMessage = 'No Value Key found'
+              errorMessage = 'Please provide a Value Key'
             }
 
             break
@@ -227,25 +149,49 @@ module.exports = function (RED) {
             }
 
             if (data.data) {
-              if (data.data.isActive === '') {
+              if (!data.data.isActive) {
                 success = false
-                errorMessage = 'isActive Property is required'
+                errorMessage = 'Please provide an "isActive" property'
               }
 
-              if (data.data.key === '') {
+              if (!data.data.key) {
                 success = false
-                errorMessage = 'No Key Property found'
+                errorMessage = 'Please provide a "key" property'
               }
             }
 
             break
           case '6': // Update Keyword Record
-          case '7': // Get Keyword Record By Id
-            if (recordId === '') {
+          case '7': // Delete Keyword Record
+            if (!recordId) {
               success = false
-              errorMessage = 'No Record Id found'
+              errorMessage = 'Please provide a Record Id'
             }
-
+          
+            break
+          case '8': // Set Values By Profille Key
+            if (!profileKey) {
+              success = false
+              errorMessage = 'Please provide a Profile Key'
+            } else if (!values) {
+              success = false
+              errorMessage = 'Please provide values'
+            }
+            break
+          case '9': // Set Value By Label
+          case '10': // Set Value By Label
+            if (!profileKey) {
+              success = false
+              errorMessage = 'Please provide a Record Id'
+            } else if (!valueKey) {
+              success = false
+              errorMessage = 'Please provide a Value Key'
+            } else if (!labelKey) {
+              success = false
+              errorMessage = 'Please provide a Label Key'
+            }
+            break
+          case '11': // Get Data
             break
         }
       }
@@ -261,23 +207,22 @@ module.exports = function (RED) {
         return false
       }
 
-      // Mustache
-      recordId = Mustache.render(recordId, msg)
-      profileKey = Mustache.render(profileKey, msg)
-      groupName = Mustache.render(groupName, msg)
-      labelKey = Mustache.render(labelKey, msg)
-      valueKey = Mustache.render(valueKey, msg)
-
       //  Create New instance of Agilite Module that will be performing requests
       const agilite = new Agilite({
         apiServerUrl: url,
         apiKey
       })
+      let response = null
 
-      // Create msg.agilite if it's null so we can store the result
-      if (!msg.agilite) {
-        msg.agilite = {}
-      }
+      // Mustache
+      if (recordId) recordId = Mustache.render(recordId, msg)
+      if (profileKey) profileKey = Mustache.render(profileKey, msg)
+      if (groupName) groupName = Mustache.render(groupName, msg)
+      if (labelKey) labelKey = Mustache.render(labelKey, msg)
+      if (valueKey) valueKey = Mustache.render(valueKey, msg)
+      if (values) values = Mustache.render(values, msg)
+      if (profileKeys) profileKeys = Mustache.render(profileKeys, msg)
+      if (recordIds) recordIds = Mustache.render(recordIds, msg)
 
       node.status({
         fill: 'yellow',
@@ -285,64 +230,50 @@ module.exports = function (RED) {
         shape: 'ring'
       })
 
-      switch (config.actionType) {
-        case '1': // Get Keywords By Profile Key
-          agilite.Keywords.getByProfileKey(profileKey, sortBy, outputFormat, logProcessId)
-            .then(function (response) {
-              reqSuccess(response)
-            })
-            .catch(function (error) {
-              reqCatch(error)
-            })
-          break
-        case '2': // Get Profile Keys By Group
-          agilite.Keywords.getProfileKeysByGroup(groupName, sortBy2, logProcessId)
-            .then(function (response) {
-              reqSuccess(response)
-            })
-            .catch(function (error) {
-              reqCatch(error)
-            })
-          break
-        case '3': // Get Keyword Value by Label
-          agilite.Keywords.getValueByLabel(profileKey, labelKey, outputFormat2, logProcessId)
-            .then(function (response) {
-              reqSuccess(response)
-            })
-            .catch(function (error) {
-              reqCatch(error)
-            })
-          break
-        case '4': // Get Keyword Label by Value
-          agilite.Keywords.getLabelByValue(profileKey, valueKey, outputFormat2, logProcessId)
-            .then(function (response) {
-              reqSuccess(response)
-            })
-            .catch(function (error) {
-              reqCatch(error)
-            })
-          break
-        case '5': // Create Keyword Record
-          agilite.Keywords.postData(data, logProcessId)
-            .then(function (response) {
-              reqSuccess(response)
-            })
-            .catch(function (error) {
-              reqCatch(error)
-            })
-          break
-        case '6': // Update Keyword Record
-          agilite.Keywords.putData(recordId, data, logProcessId)
-            .then(function (response) {
-              reqSuccess(response)
-            })
-            .catch(function (error) {
-              reqCatch(error)
-            })
-          break
-        default:
-          reqCatch({ response: { data: { errorMessage: 'No valid Action Type specified' }}})
-          break
+      try {
+        switch (config.actionType) {
+          case '1': // Get Values By Profile Key
+            response = await agilite.Keywords.getValuesByProfileKey(profileKey, sortBy, outputFormat, logProcessId)
+            break
+          case '2': // Get Profile Keys By Group
+            response = await agilite.Keywords.getProfileKeysByGroup(groupName, sortBy2, logProcessId)
+            break
+          case '3': // Get Keyword Value by Label
+            response = await agilite.Keywords.getValueByLabel(profileKey, labelKey, outputFormat2, logProcessId)
+            break
+          case '4': // Get Keyword Label by Value
+            response = await agilite.Keywords.getLabelByValue(profileKey, valueKey, outputFormat2, logProcessId)
+            break
+          case '5': // Create Keyword Record
+            response = await agilite.Keywords.postData(data, logProcessId)
+            break
+          case '6': // Update Keyword Record
+            response = await agilite.Keywords.putData(recordId, data, logProcessId)
+            break
+          case '7': // Delete Keyword Record
+            response = await agilite.Keywords.deleteData(recordId, logProcessId)
+            break
+          case '8': // Set Values By Profile Key
+            response = await agilite.Keywords.setValuesByProfileKey(profileKey, valueKey, logProcessId)
+            break
+          case '9': // Set Value By Label
+            response = await agilite.Keywords.setValueByLabel(profileKey, labelKey, valueKey, logProcessId)
+            break
+          case '10': // Set Label By Value
+            response = await agilite.Keywords.setLabelByValue(profileKey, valueKey, labelKey, logProcessId)
+            break
+          case '11': // Get Data
+            // TODO: Slim Result needs to be toggled
+            response = 'test'
+            response = await agilite.Keywords.getData(profileKeys.split(','), recordIds.split(','), false, logProcessId)
+            break
+          default:
+            throw new Error({ response: { data: { errorMessage: 'No valid Action Type specified' } } })
+        }
+
+        reqSuccess(response)
+      } catch (error) {
+        reqCatch(error)
       }
     })
   }

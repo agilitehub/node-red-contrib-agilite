@@ -4,7 +4,7 @@
         var value = $("#node-input-actionType option:selected").val();
 
         switch(value){
-          case "1"://Get Keywords By Profile Key
+          case "1":// Get Keywords By Profile Key
             document.querySelector("#rowRecordId").style.display = "none";
             document.querySelector("#rowProfileKey").style.display = "block";
             document.querySelector("#rowGroupName").style.display = "none";
@@ -14,8 +14,11 @@
             document.querySelector("#rowSort2").style.display = "none";
             document.querySelector("#rowOutputFormat").style.display = "block";
             document.querySelector("#rowOutputFormat2").style.display = "none";
+            document.querySelector("#rowValues").style.display = "none";
+            document.querySelector("#rowProfileKeys").style.display = "none";
+            document.querySelector("#rowRecordIds").style.display = "none";
             break;
-          case "2"://Get Keyword Profile Keys By Group
+          case "2":// Get Keyword Profile Keys By Group
             document.querySelector("#rowRecordId").style.display = "none";
             document.querySelector("#rowProfileKey").style.display = "none";
             document.querySelector("#rowGroupName").style.display = "block";
@@ -25,8 +28,11 @@
             document.querySelector("#rowSort2").style.display = "block";
             document.querySelector("#rowOutputFormat").style.display = "none";
             document.querySelector("#rowOutputFormat2").style.display = "none";
+            document.querySelector("#rowValues").style.display = "none";
+            document.querySelector("#rowProfileKeys").style.display = "none";
+            document.querySelector("#rowRecordIds").style.display = "none";
             break;
-          case "3"://Get Keyword Value by Label
+          case "3":// Get Keyword Value by Label
             document.querySelector("#rowRecordId").style.display = "none";
             document.querySelector("#rowProfileKey").style.display = "block";
             document.querySelector("#rowGroupName").style.display = "none";
@@ -36,8 +42,11 @@
             document.querySelector("#rowSort2").style.display = "none";
             document.querySelector("#rowOutputFormat").style.display = "none";
             document.querySelector("#rowOutputFormat2").style.display = "block";
+            document.querySelector("#rowValues").style.display = "none";
+            document.querySelector("#rowProfileKeys").style.display = "none";
+            document.querySelector("#rowRecordIds").style.display = "none";
             break;
-          case "4"://Get Keyword Label by Value
+          case "4":// Get Keyword Label by Value
             document.querySelector("#rowRecordId").style.display = "none";
             document.querySelector("#rowProfileKey").style.display = "block";
             document.querySelector("#rowGroupName").style.display = "none";
@@ -47,8 +56,11 @@
             document.querySelector("#rowSort2").style.display = "none";
             document.querySelector("#rowOutputFormat").style.display = "none";
             document.querySelector("#rowOutputFormat2").style.display = "block";
+            document.querySelector("#rowValues").style.display = "none";
+            document.querySelector("#rowProfileKeys").style.display = "none";
+            document.querySelector("#rowRecordIds").style.display = "none";
             break;
-          case "5"://Create Keyword Record
+          case "5":// Create Keyword Record
             document.querySelector("#rowRecordId").style.display = "none";
             document.querySelector("#rowProfileKey").style.display = "none";
             document.querySelector("#rowGroupName").style.display = "none";
@@ -58,8 +70,11 @@
             document.querySelector("#rowSort2").style.display = "none";
             document.querySelector("#rowOutputFormat").style.display = "none";
             document.querySelector("#rowOutputFormat2").style.display = "none";
+            document.querySelector("#rowValues").style.display = "none";
+            document.querySelector("#rowProfileKeys").style.display = "none";
+            document.querySelector("#rowRecordIds").style.display = "none";
             break;
-          case "6"://Update Keyword Record
+          case "6":// Update Keyword Record
             document.querySelector("#rowRecordId").style.display = "block";
             document.querySelector("#rowProfileKey").style.display = "none";
             document.querySelector("#rowGroupName").style.display = "none";
@@ -69,8 +84,11 @@
             document.querySelector("#rowSort2").style.display = "none";
             document.querySelector("#rowOutputFormat").style.display = "none";
             document.querySelector("#rowOutputFormat2").style.display = "none";
+            document.querySelector("#rowValues").style.display = "none";
+            document.querySelector("#rowProfileKeys").style.display = "none";
+            document.querySelector("#rowRecordIds").style.display = "none";
             break;
-          case "7"://Get Keyword Record By Id
+          case "7":// Delete Keyword Record
             document.querySelector("#rowRecordId").style.display = "block";
             document.querySelector("#rowProfileKey").style.display = "none";
             document.querySelector("#rowGroupName").style.display = "none";
@@ -80,6 +98,65 @@
             document.querySelector("#rowSort2").style.display = "none";
             document.querySelector("#rowOutputFormat").style.display = "none";
             document.querySelector("#rowOutputFormat2").style.display = "none";
+            document.querySelector("#rowValues").style.display = "none";
+            document.querySelector("#rowProfileKeys").style.display = "none";
+            document.querySelector("#rowRecordIds").style.display = "none";
+            break;
+          case "8":// Set Values By Profile Key
+            document.querySelector("#rowRecordId").style.display = "none";
+            document.querySelector("#rowProfileKey").style.display = "block";
+            document.querySelector("#rowGroupName").style.display = "none";
+            document.querySelector("#rowLabel").style.display = "none";
+            document.querySelector("#rowValue").style.display = "none";
+            document.querySelector("#rowSort").style.display = "none";
+            document.querySelector("#rowSort2").style.display = "none";
+            document.querySelector("#rowOutputFormat").style.display = "none";
+            document.querySelector("#rowOutputFormat2").style.display = "none";
+            document.querySelector("#rowValues").style.display = "block";
+            document.querySelector("#rowProfileKeys").style.display = "none";
+            document.querySelector("#rowRecordIds").style.display = "none";
+            break;
+          case "9":// Set Value By Label
+            document.querySelector("#rowRecordId").style.display = "none";
+            document.querySelector("#rowProfileKey").style.display = "block";
+            document.querySelector("#rowGroupName").style.display = "none";
+            document.querySelector("#rowLabel").style.display = "block";
+            document.querySelector("#rowValue").style.display = "block";
+            document.querySelector("#rowSort").style.display = "none";
+            document.querySelector("#rowSort2").style.display = "none";
+            document.querySelector("#rowOutputFormat").style.display = "none";
+            document.querySelector("#rowOutputFormat2").style.display = "none";
+            document.querySelector("#rowValues").style.display = "none";
+            document.querySelector("#rowProfileKeys").style.display = "none";
+            document.querySelector("#rowRecordIds").style.display = "none";
+            break;
+          case "10":// Set Label By Value
+            document.querySelector("#rowRecordId").style.display = "none";
+            document.querySelector("#rowProfileKey").style.display = "block";
+            document.querySelector("#rowGroupName").style.display = "none";
+            document.querySelector("#rowLabel").style.display = "block";
+            document.querySelector("#rowValue").style.display = "block";
+            document.querySelector("#rowSort").style.display = "none";
+            document.querySelector("#rowSort2").style.display = "none";
+            document.querySelector("#rowOutputFormat").style.display = "none";
+            document.querySelector("#rowOutputFormat2").style.display = "none";
+            document.querySelector("#rowValues").style.display = "none";
+            document.querySelector("#rowProfileKeys").style.display = "none";
+            document.querySelector("#rowRecordIds").style.display = "none";
+            break;
+          case "11":// Get Data
+            document.querySelector("#rowRecordId").style.display = "none";
+            document.querySelector("#rowProfileKey").style.display = "none";
+            document.querySelector("#rowGroupName").style.display = "none";
+            document.querySelector("#rowLabel").style.display = "none";
+            document.querySelector("#rowValue").style.display = "none";
+            document.querySelector("#rowSort").style.display = "none";
+            document.querySelector("#rowSort2").style.display = "none";
+            document.querySelector("#rowOutputFormat").style.display = "none";
+            document.querySelector("#rowOutputFormat2").style.display = "none";
+            document.querySelector("#rowValues").style.display = "none";
+            document.querySelector("#rowProfileKeys").style.display = "block";
+            document.querySelector("#rowRecordIds").style.display = "block";
             break;
           default:
             document.querySelector("#rowRecordId").style.display = "none";
@@ -91,6 +168,9 @@
             document.querySelector("#rowSort2").style.display = "none";
             document.querySelector("#rowOutputFormat").style.display = "none";
             document.querySelector("#rowOutputFormat2").style.display = "none";
+            document.querySelector("#rowValues").style.display = "none";
+            document.querySelector("#rowProfileKeys").style.display = "none";
+            document.querySelector("#rowRecordIds").style.display = "none";
             break;
         }
     }
@@ -119,7 +199,13 @@
       recordId: {
         value : ""
       },
+      recordIds: {
+        value : ""
+      },
       profileKey: {
+        value : ""
+      },
+      profileKeys: {
         value : ""
       },
       groupName: {
@@ -131,11 +217,14 @@
       valueKey: {
         value : ""
       },
+      values: {
+        value: ""
+      },
       sortBy: {
-        value:""
+        value: ""
       },
       sortBy2: {
-        value:""
+        value: ""
       },
       outputFormat: {
         value: ""
@@ -144,7 +233,7 @@
         value: ""
       },
       name: {
-        value:""
+        value: ""
       },
       field: {
         value: "payload",
@@ -180,12 +269,17 @@
   <div class="form-row" id="rowActionType">
       <label for="node-input-actionType"><i class="fa fa-arrow-circle-right"></i> Action Type</label>
       <select id="node-input-actionType" style="width:auto;">
-        <option value="1">Get Keywords By Profile Key</option>
-        <option value="2">Get Keyword Profile Keys By Group</option>
-        <option value="3">Get Keyword Value by Label</option>
-        <option value="4">Get Keyword Label by Value</option>
-        <option value="5">Create Keyword Record</option>
-        <option value="6">Update Keyword Record</option>
+        <option value="11">Get Data</option>
+        <option value="5">Create Record</option>
+        <option value="6">Update Record</option>
+        <option value="7">Delete Record</option>
+        <option value="1">Get Values By Profile Key</option>
+        <option value="8">Set Values By Profile Key</option>
+        <option value="2">Get Profile Keys By Group</option>
+        <option value="3">Get Value By Label</option>
+        <option value="9">Set Value By Label</option>
+        <option value="4">Get Label By Value</option>
+        <option value="10">Set Label By Value</option>
       </select>
   </div>
   <div class="form-row" id="rowRecordId">
@@ -196,6 +290,16 @@
     <label for="node-input-profileKey"><i class="fa fa-key"></i> Profile Key {{m}}</label>
     <input type="text" id="node-input-profileKey" />
   </div>
+
+  <div class="form-row" id="rowProfileKeys">
+    <label for="node-input-profileKeys"><i class="fa fa-key"></i> Profile Keys {{m}}</label>
+    <input type="text" id="node-input-profileKeys" />
+  </div>
+  <div class="form-row" id="rowRecordIds">
+    <label for="node-input-recordIds"><i class="fa fa-key"></i> Record Ids {{m}}</label>
+    <input type="text" id="node-input-recordIds" />
+  </div>
+
   <div class="form-row" id="rowGroupName">
     <label for="node-input-groupName"><i class="fa fa-object-group"></i> Group Name {{m}}</label>
     <input type="text" id="node-input-groupName" />
@@ -207,6 +311,10 @@
   <div class="form-row" id="rowValue">
     <label for="node-input-valueKey"><i class="fa fa-edit"></i> Value Key {{m}}</label>
     <input type="text" id="node-input-valueKey" />
+  </div>
+  <div class="form-row" id="rowValues">
+    <label for="node-input-values"><i class="fa fa-edit"></i> Values {{m}}</label>
+    <input type="text" id="node-input-values" />
   </div>
   <div class="form-row" id="rowSort">
     <label for="node-input-sortBy"><i class="fa fa-sort"></i> Sort By</label>
