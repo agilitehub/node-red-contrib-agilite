@@ -14,7 +14,6 @@
             document.querySelector("#rowSort2").style.display = "none";
             document.querySelector("#rowOutputFormat").style.display = "block";
             document.querySelector("#rowOutputFormat2").style.display = "none";
-            document.querySelector("#rowValues").style.display = "none";
             document.querySelector("#rowProfileKeys").style.display = "none";
             document.querySelector("#rowRecordIds").style.display = "none";
             break;
@@ -27,8 +26,7 @@
             document.querySelector("#rowSort").style.display = "none";
             document.querySelector("#rowSort2").style.display = "block";
             document.querySelector("#rowOutputFormat").style.display = "none";
-            document.querySelector("#rowOutputFormat2").style.display = "none";
-            document.querySelector("#rowValues").style.display = "none";
+            document.querySelector("#rowOutputFormat2").style.display = "none";        
             document.querySelector("#rowProfileKeys").style.display = "none";
             document.querySelector("#rowRecordIds").style.display = "none";
             break;
@@ -41,8 +39,7 @@
             document.querySelector("#rowSort").style.display = "none";
             document.querySelector("#rowSort2").style.display = "none";
             document.querySelector("#rowOutputFormat").style.display = "none";
-            document.querySelector("#rowOutputFormat2").style.display = "block";
-            document.querySelector("#rowValues").style.display = "none";
+            document.querySelector("#rowOutputFormat2").style.display = "block";           
             document.querySelector("#rowProfileKeys").style.display = "none";
             document.querySelector("#rowRecordIds").style.display = "none";
             break;
@@ -55,8 +52,7 @@
             document.querySelector("#rowSort").style.display = "none";
             document.querySelector("#rowSort2").style.display = "none";
             document.querySelector("#rowOutputFormat").style.display = "none";
-            document.querySelector("#rowOutputFormat2").style.display = "block";
-            document.querySelector("#rowValues").style.display = "none";
+            document.querySelector("#rowOutputFormat2").style.display = "block"; 
             document.querySelector("#rowProfileKeys").style.display = "none";
             document.querySelector("#rowRecordIds").style.display = "none";
             break;
@@ -70,7 +66,6 @@
             document.querySelector("#rowSort2").style.display = "none";
             document.querySelector("#rowOutputFormat").style.display = "none";
             document.querySelector("#rowOutputFormat2").style.display = "none";
-            document.querySelector("#rowValues").style.display = "none";
             document.querySelector("#rowProfileKeys").style.display = "none";
             document.querySelector("#rowRecordIds").style.display = "none";
             break;
@@ -84,7 +79,6 @@
             document.querySelector("#rowSort2").style.display = "none";
             document.querySelector("#rowOutputFormat").style.display = "none";
             document.querySelector("#rowOutputFormat2").style.display = "none";
-            document.querySelector("#rowValues").style.display = "none";
             document.querySelector("#rowProfileKeys").style.display = "none";
             document.querySelector("#rowRecordIds").style.display = "none";
             break;
@@ -98,7 +92,6 @@
             document.querySelector("#rowSort2").style.display = "none";
             document.querySelector("#rowOutputFormat").style.display = "none";
             document.querySelector("#rowOutputFormat2").style.display = "none";
-            document.querySelector("#rowValues").style.display = "none";
             document.querySelector("#rowProfileKeys").style.display = "none";
             document.querySelector("#rowRecordIds").style.display = "none";
             break;
@@ -112,7 +105,6 @@
             document.querySelector("#rowSort2").style.display = "none";
             document.querySelector("#rowOutputFormat").style.display = "none";
             document.querySelector("#rowOutputFormat2").style.display = "none";
-            document.querySelector("#rowValues").style.display = "block";
             document.querySelector("#rowProfileKeys").style.display = "none";
             document.querySelector("#rowRecordIds").style.display = "none";
             break;
@@ -126,7 +118,6 @@
             document.querySelector("#rowSort2").style.display = "none";
             document.querySelector("#rowOutputFormat").style.display = "none";
             document.querySelector("#rowOutputFormat2").style.display = "none";
-            document.querySelector("#rowValues").style.display = "none";
             document.querySelector("#rowProfileKeys").style.display = "none";
             document.querySelector("#rowRecordIds").style.display = "none";
             break;
@@ -140,7 +131,6 @@
             document.querySelector("#rowSort2").style.display = "none";
             document.querySelector("#rowOutputFormat").style.display = "none";
             document.querySelector("#rowOutputFormat2").style.display = "none";
-            document.querySelector("#rowValues").style.display = "none";
             document.querySelector("#rowProfileKeys").style.display = "none";
             document.querySelector("#rowRecordIds").style.display = "none";
             break;
@@ -154,7 +144,6 @@
             document.querySelector("#rowSort2").style.display = "none";
             document.querySelector("#rowOutputFormat").style.display = "none";
             document.querySelector("#rowOutputFormat2").style.display = "none";
-            document.querySelector("#rowValues").style.display = "none";
             document.querySelector("#rowProfileKeys").style.display = "block";
             document.querySelector("#rowRecordIds").style.display = "block";
             break;
@@ -168,7 +157,6 @@
             document.querySelector("#rowSort2").style.display = "none";
             document.querySelector("#rowOutputFormat").style.display = "none";
             document.querySelector("#rowOutputFormat2").style.display = "none";
-            document.querySelector("#rowValues").style.display = "none";
             document.querySelector("#rowProfileKeys").style.display = "none";
             document.querySelector("#rowRecordIds").style.display = "none";
             break;
@@ -216,9 +204,6 @@
       },
       valueKey: {
         value : ""
-      },
-      values: {
-        value: ""
       },
       sortBy: {
         value: ""
@@ -311,10 +296,6 @@
   <div class="form-row" id="rowValue">
     <label for="node-input-valueKey"><i class="fa fa-edit"></i> Value Key {{m}}</label>
     <input type="text" id="node-input-valueKey" />
-  </div>
-  <div class="form-row" id="rowValues">
-    <label for="node-input-values"><i class="fa fa-edit"></i> Values {{m}}</label>
-    <input type="text" id="node-input-values" />
   </div>
   <div class="form-row" id="rowSort">
     <label for="node-input-sortBy"><i class="fa fa-sort"></i> Sort By</label>

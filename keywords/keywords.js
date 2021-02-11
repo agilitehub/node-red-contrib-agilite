@@ -32,7 +32,6 @@ module.exports = (RED) => {
       let valueKey = config.valueKey
       let sortBy = config.sortBy
       let sortBy2 = config.sortBy2
-      let values = config.values
       let profileKeys = config.profileKeys
       let recordIds = config.recordIds
       let outputFormat = config.outputFormat
@@ -87,7 +86,7 @@ module.exports = (RED) => {
       }
 
       // Check if there's valid data to pass
-      if (typeDetect(msg.payload) !== 'Object') {
+      if (typeDetect(msg.payload) !== 'Object' && typeDetect(msg.payload) !== 'Array') {
         msg.payload = {}
       }
 
@@ -173,9 +172,6 @@ module.exports = (RED) => {
             if (!profileKey) {
               success = false
               errorMessage = 'Please provide a Profile Key'
-            } else if (!values) {
-              success = false
-              errorMessage = 'Please provide values'
             }
             break
           case '9': // Set Value By Label
@@ -220,7 +216,6 @@ module.exports = (RED) => {
       if (groupName) groupName = Mustache.render(groupName, msg)
       if (labelKey) labelKey = Mustache.render(labelKey, msg)
       if (valueKey) valueKey = Mustache.render(valueKey, msg)
-      if (values) values = Mustache.render(values, msg)
       if (profileKeys) profileKeys = Mustache.render(profileKeys, msg)
       if (recordIds) recordIds = Mustache.render(recordIds, msg)
 
@@ -254,7 +249,7 @@ module.exports = (RED) => {
             response = await agilite.Keywords.deleteData(recordId, logProcessId)
             break
           case '8': // Set Values By Profile Key
-            response = await agilite.Keywords.setValuesByProfileKey(profileKey, values, logProcessId)
+            response = await agilite.Keywords.setValuesByProfileKey(profileKey, data, logProcessId)
             break
           case '9': // Set Value By Label
             response = await agilite.Keywords.setValueByLabel(profileKey, labelKey, valueKey, logProcessId)
