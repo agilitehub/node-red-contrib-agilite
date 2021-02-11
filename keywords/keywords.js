@@ -65,7 +65,7 @@ module.exports = (RED) => {
         let errMsg = null
         msg.payload = {}
 
-        if (error.response.data.errorMessage) {
+        if (error.response) {
           errMsg = error.response.data.errorMessage
         } else if (error.message) {
           errMsg = error.message
@@ -254,7 +254,7 @@ module.exports = (RED) => {
             response = await agilite.Keywords.deleteData(recordId, logProcessId)
             break
           case '8': // Set Values By Profile Key
-            response = await agilite.Keywords.setValuesByProfileKey(profileKey, valueKey, logProcessId)
+            response = await agilite.Keywords.setValuesByProfileKey(profileKey, values, logProcessId)
             break
           case '9': // Set Value By Label
             response = await agilite.Keywords.setValueByLabel(profileKey, labelKey, valueKey, logProcessId)
