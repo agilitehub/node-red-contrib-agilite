@@ -1,5 +1,6 @@
 const Agilite = require('agilite')
 const Mustache = require('mustache')
+const Bas64ArrayBuffer = require('base64-arraybuffer')
 
 module.exports = function (RED) {
   function Files (config) {
@@ -36,6 +37,10 @@ module.exports = function (RED) {
       //  Function that is called inside .then of requests
       let reqSuccess = function (response) {
         msg.agilite.message = response.data.errorMessage
+
+        if (config.responseType === 'base64') {
+          response.data = Bas64ArrayBuffer.encode(response.data)
+        }
 
         switch (node.fieldType) {
           case 'msg':
@@ -142,8 +147,12 @@ module.exports = function (RED) {
         recordId = config.recordId
       }
 
-      if (responseType === '' && config.responseType && config.responseType !== '') {
-        responseType = config.responseType
+      if (config.responseType) {
+        if (config.responseType === 'base64') {
+          responseType = 'arraybuffer'
+        } else {
+          responseType = config.responseType
+        }
       } else {
         responseType = 'arraybuffer'
       }
@@ -229,7 +238,7 @@ module.exports = function (RED) {
             .catch(reqCatch)
           break
         case '5': // Unzip File
-        agilite.Files.unzip(recordId, logProcessId)
+          agilite.Files.unzip(recordId, logProcessId)
             .then(reqSuccess)
             .catch(reqCatch)
           break
