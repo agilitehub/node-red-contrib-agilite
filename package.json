@@ -27,7 +27,6 @@
   ],
   "dependencies": {
     "agilite": "7.2.7",
-    "axios": "0.21.1",
     "base64-arraybuffer": "0.2.0"
   },
   "keywords": [
@@ -55,29 +54,23 @@
   ],
   "node-red": {
     "nodes": {
-      "Agilite Login": "dist/configuration/agilite-login.js",
-      "Keywords": "dist/keywords/keywords.js",
-      "Tier Structures": "dist/tier-structures/tier-structures.js",
-      "Numbering": "dist/numbering/numbering.js",
-      "Connectors": "dist/connectors/connectors.js",
-      "Data Mapping": "dist/data-mapping/data-mapping.js",
-      "Templates": "dist/templates/templates.js",
-      "BPM": "dist/bpm/bpm.js",
-      "Roles": "dist/roles/roles.js",
-      "Batch Actions": "dist/batch-actions/batch-actions.js",
-      "Events": "dist/events/events.js",
-      "Batch Logging": "dist/batch-logging/batch-logging.js",
-      "Files": "dist/files/files.js",
-      "Adhoc": "dist/adhoc/adhoc.js"
+      "Agilite Login": "configuration/agilite-login.js",
+      "Keywords": "keywords/keywords.js",
+      "Tier Structures": "tier-structures/tier-structures.js",
+      "Numbering": "numbering/numbering.js",
+      "Connectors": "connectors/connectors.js",
+      "Data Mapping": "data-mapping/data-mapping.js",
+      "Templates": "templates/templates.js",
+      "BPM": "bpm/bpm.js",
+      "Roles": "roles/roles.js",
+      "Batch Actions": "batch-actions/batch-actions.js",
+      "Events": "events/events.js",
+      "Batch Logging": "batch-logging/batch-logging.js",
+      "Files": "files/files.js",
+      "Adhoc": "adhoc/adhoc.js"
     }
   },
   "devDependencies": {
-    "@types/agilite": "6.4.0",
-    "@types/node-red": "1.1.1",
-    "@types/mustache": "4.1.1",
-    "@types/type-detect": "4.0.1",
-    "mustache": "4.1.0",
-    "node-red-contrib-typescript-node": "0.1.0",
-    "typescript": "4.2.2"
+    "mustache": "4.1.0"
   }
 }
