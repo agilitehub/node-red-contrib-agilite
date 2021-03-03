@@ -3,15 +3,14 @@ const TypeDetect = require('type-detect')
 const Mustache = require('mustache')
 
 module.exports = function (RED) {
-  function Bpm (config) {
+  function BPM (config) {
     RED.nodes.createNode(this, config)
 
     const node = this
-    let success = true
+    const field = config.field || 'payload'
+    const fieldType = config.fieldType || 'msg'
     let errorMessage = ''
-
-    this.field = config.field || 'payload'
-    this.fieldType = config.fieldType || 'msg'
+    let result = null
 
     node.status({
       fill: 'blue',
@@ -19,7 +18,7 @@ module.exports = function (RED) {
       shape: 'ring'
     })
 
-    this.on('input', function (msg) {
+    this.on('input', async (msg) => {
       const serverConfig = RED.nodes.getNode(config.server)
       const history = config.excludeHistory
       const stepOptions = config.excludeStepOptions
@@ -27,10 +26,10 @@ module.exports = function (RED) {
       const comments = ''
       const url = serverConfig.server
       const failFlow = config.failFlow
-      const includeKeywords = config.includeKeywords
       let agilite = null
+      const includeKeywords = config.includeKeywords
       let apiKey = ''
-      let logProcessId = null
+      let logProcessId = ''
       let profileKey = config.profileKey
       let currentUser = config.currentUser
       let currentStep = config.currentStep
@@ -53,18 +52,16 @@ module.exports = function (RED) {
       let data = {}
 
       //  Function that is called inside .then of requests
-      const reqSuccess = function (response) {
-        msg.agilite.message = response.data.errorMessage
-
-        switch (node.fieldType) {
+      const reqSuccess = (response) => {
+        switch (fieldType) {
           case 'msg':
-            RED.util.setMessageProperty(msg, node.field, response.data)
+            RED.util.setMessageProperty(msg, field, response.data)
             break
           case 'flow':
-            node.context().flow.set(node.field, response.data)
+            node.context().flow.set(field, response.data)
             break
           case 'global':
-            node.context().global.set(node.field, response.data)
+            node.context().global.set(field, response.data)
             break
         }
 
@@ -78,18 +75,18 @@ module.exports = function (RED) {
       }
 
       //  Function that is used inside the .catch of requests
-      const reqCatch = function (error) {
+      const reqCatch = (error) => {
         let errorMessage = ''
 
-        if (error.response && error.response.data) {
-          msg.agilite.message = error.response.data.errorMessage
-          errorMessage = msg.agilite.message
+        if (error.response.data.errorMessage) {
+          errorMessage = error.response.data.errorMessage
+        } else if (error.message) {
+          errorMessage = error.message
         } else {
-          msg.agilite.message = 'Unknown Error Occurred'
-          errorMessage = error.stack
+          errorMessage = error
         }
 
-        msg.payload = msg.agilite.message
+        msg.payload = errorMessage
 
         node.status({
           fill: 'red',
@@ -105,253 +102,68 @@ module.exports = function (RED) {
       }
 
       // Check if there's valid data to pass
-      if (TypeDetect(msg.payload) !== 'Object') {
-        msg.payload = {}
-      }
-
+      if (TypeDetect(msg.payload) !== 'Object') msg.payload = {}
       data = msg.payload
 
       // Check if we need to use programmatic values
-      if (msg.agilite) {
-        if (msg.agilite.apiKey) {
-          if (msg.agilite.apiKey !== '') {
-            apiKey = msg.agilite.apiKey
-          }
-        }
-
-        if (msg.agilite.logProcessId) {
-          if (msg.agilite.logProcessId !== '') {
-            logProcessId = msg.agilite.logProcessId
-          }
-        }
-
-        if (msg.agilite.bpm) {
-          if (msg.agilite.bpm.profileKey) {
-            if (msg.agilite.bpm.profileKey !== '') {
-              profileKey = msg.agilite.bpm.profileKey
-            }
-          }
-
-          if (msg.agilite.bpm.currentUser) {
-            if (msg.agilite.bpm.currentUser !== '') {
-              currentUser = msg.agilite.bpm.currentUser
-            }
-          }
-
-          if (msg.agilite.bpm.currentStep) {
-            if (msg.agilite.bpm.currentStep !== '') {
-              currentStep = msg.agilite.bpm.currentStep
-            }
-          }
-
-          if (msg.agilite.bpm.bpmRecordId) {
-            if (msg.agilite.bpm.bpmRecordId !== '') {
-              bpmRecordId = msg.agilite.bpm.bpmRecordId
-            }
-          }
-
-          if (msg.agilite.bpm.optionSelected) {
-            if (msg.agilite.bpm.optionSelected !== '') {
-              optionSelected = msg.agilite.bpm.optionSelected
-            }
-          }
-
-          if (msg.agilite.bpm.bpmRecordIds) {
-            if (msg.agilite.bpm.bpmRecordIds !== '') {
-              bpmRecordIds = msg.agilite.bpm.bpmRecordIds
-            }
-          }
-
-          if (msg.agilite.bpm.responsibleUsers) {
-            if (msg.agilite.bpm.responsibleUsers !== '') {
-              responsibleUsers = msg.agilite.bpm.responsibleUsers
-            }
-          }
-
-          if (msg.agilite.bpm.stepNames) {
-            if (msg.agilite.bpm.stepNames !== '') {
-              stepNames = msg.agilite.bpm.stepNames
-            }
-          }
-
-          if (msg.agilite.bpm.roleNames) {
-            if (msg.agilite.bpm.roleNames !== '') {
-              roleNames = msg.agilite.bpm.roleNames
-            }
-          }
-
-          if (msg.agilite.bpm.relevantUsers) {
-            if (msg.agilite.bpm.relevantUsers !== '') {
-              relevantUsers = msg.agilite.bpm.relevantUsers
-            }
-          }
-
-          if (msg.agilite.bpm.profileKeys) {
-            if (msg.agilite.bpm.profileKeys !== '') {
-              profileKeys = msg.agilite.bpm.profileKeys
-            }
-          }
-
-          if (msg.agilite.bpm.isoLanguage) {
-            if (msg.agilite.bpm.isoLanguage !== '') {
-              isoLanguage = msg.agilite.bpm.isoLanguage
-            }
-          }
-
-          if (msg.agilite.bpm.page) {
-            if (msg.agilite.bpm.page !== '') {
-              page = msg.agilite.bpm.page
-            }
-          }
-
-          if (msg.agilite.bpm.pageLimit) {
-            if (msg.agilite.bpm.pageLimit !== '') {
-              pageLimit = msg.agilite.bpm.pageLimit
-            }
-          }
-
-          if (msg.agilite.bpm.relevantRoles) {
-            if (msg.agilite.bpm.relevantRoles !== '') {
-              relevantRoles = msg.agilite.bpm.relevantRoles
-            }
-          }
-
-          if (msg.agilite.bpm.eventStartDate) {
-            if (msg.agilite.bpm.eventStartDate !== '') {
-              eventStartDate = msg.agilite.bpm.eventStartDate
-            }
-          }
-
-          if (msg.agilite.bpm.eventEndDate) {
-            if (msg.agilite.bpm.eventEndDate !== '') {
-              eventEndDate = msg.agilite.bpm.eventEndDate
-            }
-          }
-
-          if (msg.agilite.bpm.eventStamps) {
-            if (msg.agilite.bpm.eventStamps !== '') {
-              eventStamps = msg.agilite.bpm.eventStamps
-            }
-          }
-
-          if (msg.agilite.bpm.sort) {
-            if (msg.agilite.bpm.sort !== '') {
-              sort = msg.agilite.bpm.sort
-            }
-          }
-        }
-      }
-
-      if (apiKey === '') {
-        apiKey = serverConfig.credentials.apiKey
-      }
+      if (msg.agilite) if (msg.agilite.logProcessId) logProcessId = msg.agilite.logProcessId
+      if (!apiKey) apiKey = serverConfig.credentials.apiKey
 
       // We need a apiKey, key and data to proceed
-      if (apiKey === '') {
-        success = false
+      if (!apiKey) {
         errorMessage = 'No valid API Key Provided. Please authenticate with Agilit-e first'
-      } else if (url === '') {
-        success = false
+      } else if (!url) {
         errorMessage = 'No Server URL Provided'
       } else {
         switch (config.actionType) {
           case '1': // Register BPM Record
-            if (profileKey === '') {
-              success = false
-              errorMessage = 'No Profile Key found'
-            }
-
-            if (currentUser === '') {
-              success = false
-              errorMessage = 'No Current User found'
-            }
-
+            if (!profileKey) errorMessage = 'No Profile Key found'
+            if (!currentUser) errorMessage = 'No Current User found'
             break
           case '2': // Execute
-            if (profileKey === '') {
-              success = false
-              errorMessage = 'No Profile Key found'
-            }
-
-            if (bpmRecordId === '') {
-              success = false
-              errorMessage = 'No BPM Record Id found'
-            }
-
-            if (optionSelected === '') {
-              success = false
-              errorMessage = 'No Option Selected found'
-            }
-
-            if (currentUser === '') {
-              success = false
-              errorMessage = 'No Current User found'
-            }
-
-            if (currentStep === '') {
-              success = false
-              errorMessage = 'No Current Step found'
-            }
-
+            if (!profileKey) errorMessage = 'No Profile Key found'
+            if (!bpmRecordId) errorMessage = 'No BPM Record Id found'
+            if (!optionSelected) errorMessage = 'No Option Selected found'
+            if (!currentUser) errorMessage = 'No Current User found'
+            if (!currentStep) errorMessage = 'No Current Step found'
             break
           case '3': // Get Record State
-            if (profileKeys === '') {
-              success = false
-              errorMessage = 'No Profile Keys found'
-            }
-
+            if (!profileKeys) errorMessage = 'No Profile Keys found'
             break
           case '4': // Get By Profile Key
-            if (profileKey === '') {
-              success = false
-              errorMessage = 'No Profile Key found'
-            }
-
+            if (!profileKey) errorMessage = 'No Profile Key found'
             break
           case '5': // Get Active Steps
           case '6': // Get Active Users
-            if (profileKey === '') {
-              success = false
-              errorMessage = 'No Profile Key found'
-            }
-
+            if (!profileKey) errorMessage = 'No Profile Key found'
             break
           case '7': // Assign Role
-            if (profileKey === '') {
-              success = false
+            if (!profileKey) {
               errorMessage = 'No Profile Key found'
-            } else if (bpmRecordId === '') {
-              success = false
+            } else if (!bpmRecordId) {
               errorMessage = 'No BPM Record Id found'
-            } else if (roleNames === '') {
-              success = false
+            } else if (!roleNames) {
               errorMessage = 'No Role Name(s) found'
-            } else if (currentUser === '') {
-              success = false
+            } else if (!currentUser) {
               errorMessage = 'No Current User found'
-            } else if (responsibleUsers === '') {
-              success = false
+            } else if (!responsibleUsers) {
               errorMessage = 'No Responsible User(s) found'
             }
 
             break
           case '8': // Get Assigned Roles
-            if (profileKey === '') {
-              success = false
+            if (!profileKey) {
               errorMessage = 'No Profile Key found'
-            } else if (bpmRecordId === '') {
-              success = false
+            } else if (!bpmRecordId) {
               errorMessage = 'No BPM Record Id found'
-            } else if (roleNames === '') {
-              success = false
+            } else if (!roleNames) {
               errorMessage = 'No Role Name(s) found'
             }
-
             break
         }
       }
 
-      if (!success) {
+      if (errorMessage) {
         msg.payload = errorMessage
 
         if (failFlow) {
@@ -362,11 +174,7 @@ module.exports = function (RED) {
         return false
       }
 
-      //  Create New instance of Agilite Module that will be performing requests
-      agilite = new Agilite({
-        apiServerUrl: url,
-        apiKey
-      })
+      agilite = new Agilite({ apiServerUrl: url, apiKey })
 
       //  Format Mustache properties
       if (profileKey) profileKey = Mustache.render(profileKey, msg)
@@ -399,74 +207,54 @@ module.exports = function (RED) {
       relevantRoles ? relevantRoles = relevantRoles.split(',') : relevantRoles = []
       eventStamps ? eventStamps = eventStamps.split(',') : eventStamps = []
 
-      // Create msg.agilite if it's null so we can store the result
-      if (!msg.agilite) {
-        msg.agilite = {}
-      }
-
       node.status({
         fill: 'yellow',
         text: 'Running',
         shape: 'ring'
       })
 
-      switch (config.actionType) {
-        case '1': // Register BPM Record
-          agilite.BPM.registerBPMRecord(profileKey, currentUser, history, stepOptions, visibleObjects, includeKeywords, isoLanguage, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '2': // Execute
-          agilite.BPM.execute(profileKey, bpmRecordId, optionSelected, currentUser, currentStep, comments, data, history, stepOptions, visibleObjects, includeKeywords, isoLanguage, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '3': // Get Record State
-          agilite.BPM.getRecordState(profileKeys, bpmRecordIds, stepNames, responsibleUsers, relevantUsers, relevantRoles, eventStamps, eventStartDate, eventEndDate, history, stepOptions, visibleObjects, includeKeywords, page, pageLimit, sort, isoLanguage, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '4': // Get By Profile Key
-          agilite.BPM.getByProfileKey(profileKey, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '5': // Get Active Steps
-          agilite.BPM.getActiveSteps(profileKey, isoLanguage, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '6': // Get Active Users
-          agilite.BPM.getActiveUsers(profileKey, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '7': // Assign Role
-          agilite.BPM.assignRole(profileKey, bpmRecordId, roleNames[0], currentUser, responsibleUsers, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '8': // Get Assigned Roles
-          agilite.BPM.getAssignedRoles(profileKey, bpmRecordId, roleNames, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '9': // Lock Record
-          agilite.BPM.lockRecord(bpmRecordId, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '10': // Unlock Record
-          agilite.BPM.unlockRecord(bpmRecordId, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        default:
-          reqCatch({ response: { data: { errorMessage: 'No valid Action Type specified' } } })
-          break
+      try {
+        switch (config.actionType) {
+          case '1': // Register BPM Record
+            result = await agilite.BPM.registerBPMRecord(profileKey, currentUser, history, stepOptions, visibleObjects, includeKeywords, isoLanguage, logProcessId)
+            break
+          case '2': // Execute
+            result = await agilite.BPM.execute(profileKey, bpmRecordId, optionSelected, currentUser, currentStep, comments, data, history, stepOptions, visibleObjects, includeKeywords, isoLanguage, logProcessId)
+            break
+          case '3': // Get Record State
+            result = await agilite.BPM.getRecordState(profileKeys, bpmRecordIds, stepNames, responsibleUsers, relevantUsers, relevantRoles, eventStamps, eventStartDate, eventEndDate, history, stepOptions, visibleObjects, includeKeywords, page, pageLimit, sort, isoLanguage, logProcessId)
+            break
+          case '4': // Get By Profile Key
+            result = await agilite.BPM.getByProfileKey(profileKey, logProcessId)
+            break
+          case '5': // Get Active Steps
+            result = await agilite.BPM.getActiveSteps(profileKey, isoLanguage, logProcessId)
+            break
+          case '6': // Get Active Users
+            result = await agilite.BPM.getActiveUsers(profileKey, logProcessId)
+            break
+          case '7': // Assign Role
+            result = await agilite.BPM.assignRole(profileKey, bpmRecordId, roleNames[0], currentUser, responsibleUsers, logProcessId)
+            break
+          case '8': // Get Assigned Roles
+            result = await agilite.BPM.getAssignedRoles(profileKey, bpmRecordId, roleNames, logProcessId)
+            break
+          case '9': // Lock Record
+            result = await agilite.BPM.lockRecord(bpmRecordId, logProcessId)
+            break
+          case '10': // Unlock Record
+            result = await agilite.BPM.unlockRecord(bpmRecordId, logProcessId)
+            break
+          default:
+            throw new Error('No valid Action Type specified')
+        }
+
+        reqSuccess(result)
+      } catch (error) {
+        reqCatch(error)
       }
     })
   }
 
-  RED.nodes.registerType('bpm', Bpm)
+  RED.nodes.registerType('bpm', BPM)
 }

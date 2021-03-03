@@ -7,11 +7,10 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config)
 
     const node = this
-    let success = true
+    const field = config.field || 'payload'
+    const fieldType = config.fieldType || 'msg'
     let errorMessage = ''
-
-    this.field = config.field || 'payload'
-    this.fieldType = config.fieldType || 'msg'
+    let result = null
 
     node.status({
       fill: 'blue',
@@ -19,38 +18,36 @@ module.exports = function (RED) {
       shape: 'ring'
     })
 
-    this.on('input', function (msg) {
+    this.on('input', async (msg) => {
       const serverConfig = RED.nodes.getNode(config.server)
+      let agilite = null
       const persistFile = config.persistFile
       const isPublic = config.isPublic
       const url = serverConfig.server
       const failFlow = config.failFlow
       const data = msg.payload
-      let agilite = null
       let apiKey = ''
-      let logProcessId = null
+      let logProcessId = ''
       let fileName = config.fileName
       let contentType = config.contentType
       let responseType = ''
       let recordId = config.recordId
 
       //  Function that is called inside .then of requests
-      const reqSuccess = function (response) {
+      const reqSuccess = (response) => {
         msg.agilite.message = response.data.errorMessage
 
-        if (config.responseType === 'base64') {
-          response.data = Bas64ArrayBuffer.encode(response.data)
-        }
+        if (config.responseType === 'base64') response.data = Bas64ArrayBuffer.encode(response.data)
 
-        switch (node.fieldType) {
+        switch (fieldType) {
           case 'msg':
-            RED.util.setMessageProperty(msg, node.field, response.data)
+            RED.util.setMessageProperty(msg, field, response.data)
             break
           case 'flow':
-            node.context().flow.set(node.field, response.data)
+            node.context().flow.set(field, response.data)
             break
           case 'global':
-            node.context().global.set(node.field, response.data)
+            node.context().global.set(field, response.data)
             break
         }
 
@@ -64,18 +61,18 @@ module.exports = function (RED) {
       }
 
       //  Function that is used inside the .catch of requests
-      const reqCatch = function (error) {
+      const reqCatch = (error) => {
         let errorMessage = ''
 
-        if (error.response && error.response.data.errorMessage) {
-          msg.agilite.message = error.response.data.errorMessage
-          errorMessage = msg.agilite.message
+        if (error.response.data.errorMessage) {
+          errorMessage = error.response.data.errorMessage
+        } else if (error.message) {
+          errorMessage = error.message
         } else {
-          msg.agilite.message = 'Unknown Error Occurred'
-          errorMessage = error.stack
+          errorMessage = error
         }
 
-        msg.payload = msg.agilite.message
+        msg.payload = errorMessage
 
         node.status({
           fill: 'red',
@@ -91,61 +88,8 @@ module.exports = function (RED) {
       }
 
       // Check if we need to use programmatic values
-      if (msg.agilite) {
-        if (msg.agilite.apiKey) {
-          if (msg.agilite.apiKey !== '') {
-            apiKey = msg.agilite.apiKey
-          }
-        }
-
-        if (msg.agilite.logProcessId) {
-          if (msg.agilite.logProcessId !== '') {
-            logProcessId = msg.agilite.logProcessId
-          }
-        }
-
-        if (msg.agilite.files) {
-          if (msg.agilite.files.fileName) {
-            if (msg.agilite.files.fileName !== '') {
-              fileName = msg.agilite.files.fileName
-            }
-          }
-
-          if (msg.agilite.files.contentType) {
-            if (msg.agilite.files.contentType !== '') {
-              contentType = msg.agilite.files.contentType
-            }
-          }
-
-          if (msg.agilite.files.recordId) {
-            if (msg.agilite.files.recordId !== '') {
-              recordId = msg.agilite.files.recordId
-            }
-          }
-
-          if (msg.agilite.files.responseType) {
-            if (msg.agilite.files.responseType !== '') {
-              responseType = msg.agilite.files.responseType
-            }
-          }
-        }
-      }
-
-      if (apiKey === '') {
-        apiKey = serverConfig.credentials.apiKey
-      }
-
-      if (fileName === '') {
-        recordId = config.fileName
-      }
-
-      if (contentType === '') {
-        contentType = config.contentType
-      }
-
-      if (recordId === '') {
-        recordId = config.recordId
-      }
+      if (msg.agilite) if (msg.agilite.logProcessId) logProcessId = msg.agilite.logProcessId
+      if (!apiKey) apiKey = serverConfig.credentials.apiKey
 
       if (config.responseType) {
         if (config.responseType === 'base64') {
@@ -163,32 +107,24 @@ module.exports = function (RED) {
       contentType = Mustache.render(contentType, msg)
 
       // Validate Values
-      if (apiKey === '') {
-        success = false
+      if (!apiKey) {
         errorMessage = 'No valid API Key Provided. Please authenticate with Agilit-e first'
-      } else if (url === '') {
-        success = false
+      } else if (!url) {
         errorMessage = 'No Server URL Provided'
       } else {
         switch (config.actionType) {
           case '1':
           case '2':
           case '3':
-            if (!recordId) {
-              success = false
-              errorMessage = 'Please provide a Record Id'
-            }
+            if (!recordId) errorMessage = 'Please provide a Record Id'
             break
           case '4':
-            if (!fileName) {
-              success = false
-              errorMessage = 'Please provide a File Name (e.g. image.jpeg)'
-            }
+            if (!fileName) errorMessage = 'Please provide a File Name (e.g. image.jpeg)'
             break
         }
       }
 
-      if (!success) {
+      if (errorMessage) {
         msg.payload = errorMessage
 
         if (failFlow) {
@@ -199,16 +135,7 @@ module.exports = function (RED) {
         return false
       }
 
-      //  Create New instance of Agilite Module that will be performing requests
-      agilite = new Agilite({
-        apiServerUrl: url,
-        apiKey
-      })
-
-      // Create msg.agilite if it's null so we can store the result
-      if (!msg.agilite) {
-        msg.agilite = {}
-      }
+      agilite = new Agilite({ apiServerUrl: url, apiKey })
 
       node.status({
         fill: 'yellow',
@@ -216,35 +143,30 @@ module.exports = function (RED) {
         shape: 'ring'
       })
 
-      switch (config.actionType) {
-        case '1': // Get File
-          agilite.Files.getFile(recordId, responseType, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '2': // Get File Name
-          agilite.Files.getFileName(recordId, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '3': // Delete File
-          agilite.Files.deleteFile(recordId, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '4': // Post File
-          agilite.Files.uploadFile(fileName, contentType, data, persistFile, isPublic, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '5': // Unzip File
-          agilite.Files.unzip(recordId, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        default:
-          reqCatch({ response: { data: { errorMessage: 'No valid Action Type specified' } } })
-          break
+      try {
+        switch (config.actionType) {
+          case '1': // Get File
+            result = await agilite.Files.getFile(recordId, responseType, logProcessId)
+            break
+          case '2': // Get File Name
+            result = await agilite.Files.getFileName(recordId, logProcessId)
+            break
+          case '3': // Delete File
+            result = await agilite.Files.deleteFile(recordId, logProcessId)
+            break
+          case '4': // Post File
+            result = await agilite.Files.uploadFile(fileName, contentType, data, persistFile, isPublic, logProcessId)
+            break
+          case '5': // Unzip File
+            result = await agilite.Files.unzip(recordId, logProcessId)
+            break
+          default:
+            throw new Error('No valid Action Type specified')
+        }
+
+        reqSuccess(result)
+      } catch (error) {
+        reqCatch(error)
       }
     })
   }

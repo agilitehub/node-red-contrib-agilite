@@ -7,10 +7,10 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config)
 
     const node = this
-    let success = true
+    const field = config.field || 'payload'
+    const fieldType = config.fieldType || 'msg'
     let errorMessage = ''
-    this.field = config.field || 'payload'
-    this.fieldType = config.fieldType || 'msg'
+    let result = null
 
     node.status({
       fill: 'blue',
@@ -18,31 +18,31 @@ module.exports = function (RED) {
       shape: 'ring'
     })
 
-    this.on('input', function (msg) {
+    this.on('input', async (msg) => {
       const serverConfig = RED.nodes.getNode(config.server)
-      const url = serverConfig.server
-      const failFlow = config.failFlow
       let agilite = null
       let apiKey = ''
-      let logProcessId = null
+      let logProcessId = ''
       let tierKeys = config.tierKeys
       let sortValues = config.sortValues
       let valuesOutputFormat = config.valuesOutputFormat
-      let includeValues = config.includeValues
-      let includeMetaData = config.includeMetaData
-      let includeTierEntries = config.includeTierEntries
+      const includeValues = config.includeValues
+      const includeMetaData = config.includeMetaData
+      const includeTierEntries = config.includeTierEntries
+      const url = serverConfig.server
+      const failFlow = config.failFlow
 
       //  Function that is called inside .then of requests
-      const reqSuccess = function (response) {
-        switch (node.fieldType) {
+      const reqSuccess = (response) => {
+        switch (fieldType) {
           case 'msg':
-            RED.util.setMessageProperty(msg, node.field, response.data)
+            RED.util.setMessageProperty(msg, field, response.data)
             break
           case 'flow':
-            node.context().flow.set(node.field, response.data)
+            node.context().flow.set(field, response.data)
             break
           case 'global':
-            node.context().global.set(node.field, response.data)
+            node.context().global.set(field, response.data)
             break
         }
 
@@ -56,18 +56,18 @@ module.exports = function (RED) {
       }
 
       //  Function that is used inside the .catch of requests
-      const reqCatch = function (error) {
+      const reqCatch = (error) => {
         let errorMessage = ''
 
-        if (error.response && error.response.data) {
-          msg.agilite.message = error.response.data.errorMessage
-          errorMessage = msg.agilite.message
+        if (error.response.data.errorMessage) {
+          errorMessage = error.response.data.errorMessage
+        } else if (error.message) {
+          errorMessage = error.message
         } else {
-          msg.agilite.message = 'Unknown Error Occurred'
-          errorMessage = error.stack
+          errorMessage = error
         }
 
-        msg.payload = msg.agilite.message
+        msg.payload = errorMessage
 
         node.status({
           fill: 'red',
@@ -83,87 +83,26 @@ module.exports = function (RED) {
       }
 
       // Check if there's valid data to pass
-      if (TypeDetect(msg.payload) !== 'Object') {
-        msg.payload = {}
-      }
+      if (TypeDetect(msg.payload) !== 'Object') msg.payload = {}
 
       // Check if we need to use programmatic values
-      if (msg.agilite) {
-        if (msg.agilite.apiKey) {
-          if (msg.agilite.apiKey !== '') {
-            apiKey = msg.agilite.apiKey
-          }
-        }
-
-        if (msg.agilite.logProcessId) {
-          if (msg.agilite.logProcessId !== '') {
-            logProcessId = msg.agilite.logProcessId
-          }
-        }
-
-        if (msg.agilite.tierStructures) {
-          if (msg.agilite.tierStructures.tierKeys) {
-            if (msg.agilite.tierStructures.tierKeys !== '') {
-              tierKeys = msg.agilite.tierStructures.tierKeys
-            }
-          }
-
-          if (msg.agilite.tierStructures.sortValues) {
-            if (msg.agilite.tierStructures.sortValues !== '') {
-              sortValues = msg.agilite.tierStructures.sortValues
-            }
-          }
-
-          if (msg.agilite.tierStructures.valuesOutputFormat) {
-            if (msg.agilite.tierStructures.valuesOutputFormat !== '') {
-              valuesOutputFormat = msg.agilite.tierStructures.valuesOutputFormat
-            }
-          }
-
-          if (msg.agilite.tierStructures.includeValues) {
-            if (msg.agilite.tierStructures.includeValues !== '') {
-              includeValues = msg.agilite.tierStructures.includeValues
-            }
-          }
-
-          if (msg.agilite.tierStructures.includeMetaData) {
-            if (msg.agilite.tierStructures.includeMetaData !== '') {
-              includeMetaData = msg.agilite.tierStructures.includeMetaData
-            }
-          }
-
-          if (msg.agilite.tierStructures.includeTierEntries) {
-            if (msg.agilite.tierStructures.includeTierEntries !== '') {
-              includeTierEntries = msg.agilite.tierStructures.includeTierEntries
-            }
-          }
-        }
-      }
-
-      if (apiKey === '') {
-        apiKey = serverConfig.credentials.apiKey
-      }
+      if (msg.agilite) if (msg.agilite.logProcessId) logProcessId = msg.agilite.logProcessId
+      if (!apiKey) apiKey = serverConfig.credentials.apiKey
 
       // We need a apiKey, key and data to proceed
-      if (apiKey === '') {
-        success = false
+      if (!apiKey) {
         errorMessage = 'No valid API Key Provided. Please authenticate with Agilit-e first'
-      } else if (url === '') {
-        success = false
+      } else if (!url) {
         errorMessage = 'No Server URL Provided'
       } else {
         switch (config.actionType) {
           case '1': // getTierByKey
-            if (tierKeys === '') {
-              success = false
-              errorMessage = 'No Tier Keys Provided'
-            }
-
+            if (!tierKeys) errorMessage = 'No Tier Keys Provided'
             break
         }
       }
 
-      if (!success) {
+      if (errorMessage) {
         msg.payload = errorMessage
 
         if (failFlow) {
@@ -174,11 +113,7 @@ module.exports = function (RED) {
         return false
       }
 
-      //  Create New instance of Agilite Module that will be performing requests
-      agilite = new Agilite({
-        apiServerUrl: url,
-        apiKey
-      })
+      agilite = new Agilite({ apiServerUrl: url, apiKey })
 
       //  Format Mustache properties
       tierKeys = Mustache.render(tierKeys, msg)
@@ -188,23 +123,22 @@ module.exports = function (RED) {
       //  Finalize array properties
       tierKeys = tierKeys.split(',')
 
-      // Create msg.agilite if it's null so we can store the result
-      if (!msg.agilite) {
-        msg.agilite = {}
-      }
-
       node.status({
         fill: 'yellow',
         text: 'Running',
         shape: 'ring'
       })
 
-      switch (config.actionType) {
-        case '1': // getTierByKey
-          agilite.TierStructures.getTierByKey(tierKeys, includeValues, includeMetaData, includeTierEntries, sortValues, valuesOutputFormat, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
+      try {
+        switch (config.actionType) {
+          case '1': // getTierByKey
+            result = await agilite.TierStructures.getTierByKey(tierKeys, includeValues, includeMetaData, includeTierEntries, sortValues, valuesOutputFormat, logProcessId)
+            break
+        }
+
+        reqSuccess(result)
+      } catch (error) {
+        reqCatch(error)
       }
     })
   }

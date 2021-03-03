@@ -7,10 +7,10 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config)
 
     const node = this
-    let success = true
+    const field = config.field || 'payload'
+    const fieldType = config.fieldType || 'msg'
     let errorMessage = ''
-    this.field = config.field || 'payload'
-    this.fieldType = config.fieldType || 'msg'
+    let result = null
 
     node.status({
       fill: 'blue',
@@ -18,27 +18,27 @@ module.exports = function (RED) {
       shape: 'ring'
     })
 
-    this.on('input', function (msg) {
+    this.on('input', async (msg) => {
       const serverConfig = RED.nodes.getNode(config.server)
+      let agilite = null
+      let profileKey = config.profileKey
       const url = serverConfig.server
       const failFlow = config.failFlow
-      let agilite = null
       let apiKey = ''
-      let logProcessId = null
-      let profileKey = config.profileKey
+      let logProcessId = ''
       let data = null
 
       //  Function that is called inside .then of requests
-      const reqSuccess = function (response) {
-        switch (node.fieldType) {
+      const reqSuccess = (response) => {
+        switch (fieldType) {
           case 'msg':
-            RED.util.setMessageProperty(msg, node.field, response.data)
+            RED.util.setMessageProperty(msg, field, response.data)
             break
           case 'flow':
-            node.context().flow.set(node.field, response.data)
+            node.context().flow.set(field, response.data)
             break
           case 'global':
-            node.context().global.set(node.field, response.data)
+            node.context().global.set(field, response.data)
             break
         }
 
@@ -52,17 +52,18 @@ module.exports = function (RED) {
       }
 
       //  Function that is used inside the .catch of requests
-      const reqCatch = function (error) {
+      const reqCatch = (error) => {
         let errorMessage = ''
-        if (error.response && error.response.data) {
-          msg.agilite.message = error.response.data.errorMessage
-          errorMessage = msg.agilite.message
+
+        if (error.response.data.errorMessage) {
+          errorMessage = error.response.data.errorMessage
+        } else if (error.message) {
+          errorMessage = error.message
         } else {
-          msg.agilite.message = 'Unknown Error Occurred'
-          errorMessage = error.stack
+          errorMessage = error
         }
 
-        msg.payload = msg.agilite.message
+        msg.payload = errorMessage
 
         node.status({
           fill: 'red',
@@ -78,66 +79,32 @@ module.exports = function (RED) {
       }
 
       // Check if there's valid data to pass
-      if (TypeDetect(msg.payload) !== 'Object') { // TODO: These values should be stored and referenced as Enums
-        msg.payload = {}
-      }
-
+      if (TypeDetect(msg.payload) !== 'Object') msg.payload = {}
       data = msg.payload
 
       // Check if we need to use a profile key passed to this node
-      if (msg.agilite) {
-        if (msg.agilite.apiKey) {
-          if (msg.agilite.apiKey !== '') {
-            apiKey = msg.agilite.apiKey
-          }
-        }
-
-        if (msg.agilite.logProcessId) {
-          if (msg.agilite.logProcessId !== '') {
-            logProcessId = msg.agilite.logProcessId
-          }
-        }
-
-        if (msg.agilite.events) {
-          if (msg.agilite.events.profileKey) {
-            if (msg.agilite.events.profileKey !== '') {
-              profileKey = msg.agilite.events.profileKey
-            }
-          }
-        }
-      }
-
-      if (apiKey === '') {
-        apiKey = serverConfig.credentials.apiKey
-      }
-
-      if (profileKey === '') {
-        profileKey = config.profileKey
-      }
+      if (msg.agilite) if (msg.agilite.logProcessId) logProcessId = msg.agilite.logProcessId
+      if (!apiKey) apiKey = serverConfig.credentials.apiKey
+      if (profileKey) profileKey = config.profileKey
 
       // Mustache
       profileKey = Mustache.render(profileKey, msg)
 
       // We need a token, keys and data to proceed
-      if (apiKey === '') {
-        success = false
+      if (!apiKey) {
         errorMessage = 'No valid API Key Provided. Please authenticate with Agilit-e first'
-      } else if (url === '') {
-        success = false
+      } else if (!url) {
         errorMessage = 'No Server URL Provided'
       } else {
         switch (config.actionType) {
           case '1': // Execute
           case '2': // Subscribe
-            if (profileKey === '') {
-              success = false
-              errorMessage = 'No Profile Key found'
-            }
+            if (!profileKey) errorMessage = 'No Profile Key found'
             break
         }
       }
 
-      if (!success) {
+      if (errorMessage) {
         msg.payload = errorMessage
 
         if (failFlow) {
@@ -148,16 +115,7 @@ module.exports = function (RED) {
         return false
       }
 
-      //  Create New instance of Agilite Module that will be performing requests
-      agilite = new Agilite({
-        apiServerUrl: url,
-        apiKey
-      })
-
-      // Create msg.agilite if it's null so we can store the result
-      if (!msg.agilite) {
-        msg.agilite = {}
-      }
+      agilite = new Agilite({ apiServerUrl: url, apiKey })
 
       node.status({
         fill: 'yellow',
@@ -165,20 +123,21 @@ module.exports = function (RED) {
         shape: 'ring'
       })
 
-      switch (config.actionType) {
-        case '1':
-          agilite.Events.execute(profileKey, data, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '2':
-          agilite.Events.subscribe(profileKey, data, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        default:
-          reqCatch({ response: { data: { errorMessage: 'No valid Action Type specified' } } })
-          break
+      try {
+        switch (config.actionType) {
+          case '1':
+            result = await agilite.Events.execute(profileKey, data, logProcessId)
+            break
+          case '2':
+            result = await agilite.Events.subscribe(profileKey, data, logProcessId)
+            break
+          default:
+            throw new Error('No valid Action Type specified')
+        }
+
+        reqSuccess(result)
+      } catch (error) {
+        reqCatch(error)
       }
     })
   }

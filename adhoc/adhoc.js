@@ -7,11 +7,10 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config)
 
     const node = this
-    let success = true
+    const field = config.field || 'payload'
+    const fieldType = config.fieldType || 'msg'
     let errorMessage = ''
-
-    this.field = config.field || 'payload'
-    this.fieldType = config.fieldType || 'msg'
+    let result = null
 
     node.status({
       fill: 'blue',
@@ -19,14 +18,14 @@ module.exports = function (RED) {
       shape: 'ring'
     })
 
-    this.on('input', function (msg) {
+    this.on('input', async (msg) => {
       const serverConfig = RED.nodes.getNode(config.server)
       const failFlow = config.failFlow
       const url = serverConfig.server
       const fullName = config.fullName
       let agilite = null
       let apiKey = ''
-      let logProcessId = null
+      let logProcessId = ''
       let dateTimeValue = config.dateTimeValue
       let formatKey = config.formatKey
       let recordId = config.recordId
@@ -35,16 +34,16 @@ module.exports = function (RED) {
       let apiKeyValue = config.apiKey
 
       //  Function that is called inside .then of requests
-      const reqSuccess = function (response) {
-        switch (node.fieldType) {
+      const reqSuccess = (response) => {
+        switch (fieldType) {
           case 'msg':
-            RED.util.setMessageProperty(msg, node.field, response.data)
+            RED.util.setMessageProperty(msg, field, response.data)
             break
           case 'flow':
-            node.context().flow.set(node.field, response.data)
+            node.context().flow.set(field, response.data)
             break
           case 'global':
-            node.context().global.set(node.field, response.data)
+            node.context().global.set(field, response.data)
             break
         }
 
@@ -58,18 +57,18 @@ module.exports = function (RED) {
       }
 
       //  Function that is used inside the .catch of requests
-      const reqCatch = function (error) {
+      const reqCatch = (error) => {
         let errorMessage = ''
 
-        if (error.response && error.response.data) {
-          msg.agilite.message = error.response.data.errorMessage
-          errorMessage = msg.agilite.message
+        if (error.response.data.errorMessage) {
+          errorMessage = error.response.data.errorMessage
+        } else if (error.message) {
+          errorMessage = error.message
         } else {
-          msg.agilite.message = 'Unknown Error Occurred'
-          errorMessage = error.stack
+          errorMessage = error
         }
 
-        msg.payload = msg.agilite.message
+        msg.payload = errorMessage
 
         node.status({
           fill: 'red',
@@ -91,86 +90,43 @@ module.exports = function (RED) {
         case '7': // XML to JS
         case '2': // Convert HTML to JSON
           // Make sure data is a string
-          if (TypeDetect(msg.payload) !== 'string') {
-            msg.payload = ''
-          }
-
-          data = msg.payload
+          if (TypeDetect(msg.payload) !== 'string') msg.payload = ''
           break
         case '8': // JS to XML
         case '3': // Generate PDF
           // Make sure data is a object
-          if (TypeDetect(msg.payload) !== 'Object') {
-            msg.payload = {}
-          }
-
-          data = msg.payload
+          if (TypeDetect(msg.payload) !== 'Object') msg.payload = {}
           break
         case '9': // Json Diff
-          data = msg.payload
           break
         case '10': // Generate Username
         // Make sure data is an Array
-          if (TypeDetect(msg.payload) !== 'Array') {
-            msg.payload = []
-          }
-
-          data = msg.payload
-
-          if (fullName === '') {
-            node.error('Please provide a \'Full Name\' in the node interface')
-            return false
-          }
-
+          if (TypeDetect(msg.payload) !== 'Array') msg.payload = []
+          if (fullName === '') return node.error('Please provide a \'Full Name\' in the node interface')
           break
         case '11': // Generate OCR
-          if (recordId === '') {
-            node.error('Please provide a \'Record ID\'')
-            return false
-          }
+          if (recordId === '') return node.error('Please provide a \'Record ID\'')
           break
         case '12': // Authenticate Token
-          if (msg.agilite && msg.agilite.apiKey) {
-            apiKeyValue = msg.agilite.apiKey
-            break
-          } else if (apiKeyValue === '') {
-            node.error('Please provide an API Key')
-            return false
-          }
+          if (!apiKeyValue) return node.error('Please provide an API Key')
           break
         default: // get request
-          data = null
       }
+
+      data = msg.payload
 
       // Check if we need to use programmatic values
-      if (msg.agilite) {
-        if (msg.agilite.apiKey) {
-          if (msg.agilite.apiKey !== '') {
-            apiKey = msg.agilite.apiKey
-          }
-        }
-
-        if (msg.agilite.logProcessId) {
-          if (msg.agilite.logProcessId !== '') {
-            logProcessId = msg.agilite.logProcessId
-          }
-        }
-      }
-
-      if (apiKey === '') {
-        apiKey = serverConfig.credentials.apiKey
-      }
+      if (msg.agilite) if (msg.agilite.logProcessId) logProcessId = msg.agilite.logProcessId
+      if (!apiKey) apiKey = serverConfig.credentials.apiKey
 
       // We need a token, key and data to proceed
-      if (apiKey === '') {
-        success = false
+      if (!apiKey) {
         errorMessage = 'No valid API Key Provided. Please authenticate with Agilit-e first'
-      } else if (url === '') {
-        success = false
+      } else if (!url) {
         errorMessage = 'No Server URL Provided'
       }
 
-      if (!success) {
+      if (errorMessage) {
         msg.payload = errorMessage
 
         if (failFlow) {
@@ -181,21 +137,12 @@ module.exports = function (RED) {
         return false
       }
 
-      //  Create New instance of Agilite Module that will be performing requests
-      agilite = new Agilite({
-        apiServerUrl: url,
-        apiKey
-      })
+      agilite = new Agilite({ apiServerUrl: url, apiKey })
 
       dateTimeValue = Mustache.render(dateTimeValue, msg)
       formatKey = Mustache.render(formatKey, msg)
       recordId = Mustache.render(recordId, msg)
       apiKeyValue = Mustache.render(apiKeyValue, msg)
-
-      // Create msg.agilite if it's null so we can store the result
-      if (!msg.agilite) {
-        msg.agilite = {}
-      }
 
       switch (config.actionType) {
         case '1': // Encode XML
@@ -233,26 +180,24 @@ module.exports = function (RED) {
         shape: 'ring'
       })
 
-      switch (config.actionType) {
-        case '10': // Generate Username
-          agilite.Utils.generateUsername(fullName, data, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '11': // Generate OCR
-          agilite.Utils.generateOCR(recordId, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '12': // Authenticate Token
-          agilite.authenticateToken(apiKeyValue)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        default:
-          agilite.Utils[action](action !== 'formatDateTime' ? data : dateTimeValue, formatKey, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
+      try {
+        switch (config.actionType) {
+          case '10': // Generate Username
+            result = await agilite.Utils.generateUsername(fullName, data, logProcessId)
+            break
+          case '11': // Generate OCR
+            result = await agilite.Utils.generateOCR(recordId, logProcessId)
+            break
+          case '12': // Authenticate Token
+            result = await agilite.authenticateToken(apiKeyValue)
+            break
+          default:
+            result = await agilite.Utils[action](action !== 'formatDateTime' ? data : dateTimeValue, formatKey, logProcessId)
+        }
+
+        reqSuccess(result)
+      } catch (error) {
+        reqCatch(error)
       }
     })
   }

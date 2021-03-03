@@ -1,17 +1,15 @@
 const Agilite = require('agilite')
+const TypeDetect = require('type-detect')
+const Mustache = require('mustache')
 
-module.exports = (RED) => {
+module.exports = function (RED) {
   function Keywords (config) {
     RED.nodes.createNode(this, config)
 
     const node = this
-    let success = true
+    const field = config.field || 'payload'
+    const fieldType = config.fieldType || 'msg'
     let errorMessage = ''
-    this.field = config.field || 'payload'
-    this.fieldType = config.fieldType || 'msg'
-
-    const TypeDetect = require('type-detect')
-    const Mustache = require('mustache')
 
     node.status({
       fill: 'blue',
@@ -21,33 +19,36 @@ module.exports = (RED) => {
 
     this.on('input', async (msg) => {
       const serverConfig = RED.nodes.getNode(config.server)
-      const failFlow = config.failFlow
-      const outputFormat2 = config.outputFormat2
-      const logProcessId = null
+      let agilite = null
       const outputFormat = config.outputFormat
+      const outputFormat2 = config.outputFormat2
       const sortBy = config.sortBy
       const sortBy2 = config.sortBy2
+      const url = serverConfig.server
+      const failFlow = config.failFlow
       let apiKey = ''
-      let recordId = config.recordId
+      let logProcessId = ''
       let profileKey = config.profileKey
+      let recordId = config.recordId
       let groupName = config.groupName
       let labelKey = config.labelKey
       let valueKey = config.valueKey
       let profileKeys = config.profileKeys
       let recordIds = config.recordIds
-      let url = ''
+      let response = null
       let data = {}
 
+      //  Function that is called inside .then of requests
       const reqSuccess = (response) => {
-        switch (node.fieldType) {
+        switch (fieldType) {
           case 'msg':
-            RED.util.setMessageProperty(msg, node.field, response.data)
+            RED.util.setMessageProperty(msg, field, response.data)
             break
           case 'flow':
-            node.context().flow.set(node.field, response.data)
+            node.context().flow.set(field, response.data)
             break
           case 'global':
-            node.context().global.set(node.field, response.data)
+            node.context().global.set(field, response.data)
             break
         }
 
@@ -60,17 +61,19 @@ module.exports = (RED) => {
         node.send(msg)
       }
 
+      //  Function that is used inside the .catch of requests
       const reqCatch = (error) => {
-        let errMsg = null
-        msg.payload = {}
+        let errorMessage = ''
 
-        if (error.response) {
-          errMsg = error.response.data.errorMessage
+        if (error.response.data.errorMessage) {
+          errorMessage = error.response.data.errorMessage
         } else if (error.message) {
-          errMsg = error.message
+          errorMessage = error.message
         } else {
-          errMsg = 'Unknown Error Occurred'
+          errorMessage = error
         }
+
+        msg.payload = errorMessage
 
         node.status({
           fill: 'red',
@@ -79,110 +82,69 @@ module.exports = (RED) => {
         })
 
         if (failFlow) {
-          node.error(errMsg, msg)
+          node.error(errorMessage, msg)
         } else {
           node.send(msg)
         }
       }
 
+      if (msg.agilite) if (msg.agilite.logProcessId) logProcessId = msg.agilite.logProcessId
+
       // Check if there's valid data to pass
-      if (TypeDetect(msg.payload) !== 'Object' && TypeDetect(msg.payload) !== 'Array') {
-        msg.payload = {}
-      }
-
-      if (!apiKey) {
-        apiKey = serverConfig.credentials.apiKey
-      }
-
-      url = serverConfig.server
+      if (TypeDetect(msg.payload) !== 'Object' && TypeDetect(msg.payload) !== 'Array') msg.payload = {}
       data = msg.payload
+
+      if (!apiKey) apiKey = serverConfig.credentials.apiKey
 
       // We need a apiKey, key and data to proceed
       if (!apiKey) {
-        success = false
         errorMessage = 'No valid API Key Provided. Please authenticate with Agilit-e first'
       } else if (!url) {
-        success = false
         errorMessage = 'No Server URL Provided'
       } else {
         switch (config.actionType) {
           case '1': // Get Keywords By Profile Key
-            if (!profileKey) {
-              success = false
-              errorMessage = 'Please provide a Profile Key'
-            }
-
+            if (!profileKey) errorMessage = 'Please provide a Profile Key'
             break
           case '2': // Get Profile Keys By Group
-            if (!groupName) {
-              success = false
-              errorMessage = 'Please provide a Group Name'
-            }
-
+            if (!groupName) errorMessage = 'Please provide a Group Name'
             break
           case '3': // Get Keyword Value by Label
             if (!profileKey) {
-              success = false
               errorMessage = 'Please provide a Profile Key'
             } else if (!labelKey) {
-              success = false
               errorMessage = 'Please provide a Label Key'
             }
-
             break
           case '4': // Get Keyword Label by Value
             if (!profileKey) {
-              success = false
               errorMessage = 'Please provide a Profile Key'
             } else if (!valueKey) {
-              success = false
               errorMessage = 'Please provide a Value Key'
             }
-
             break
           case '5': // Create Keyword
-            // data object should exist in msg.payload i.e msg.payload.data.isActive etc
-            if (!data.data) {
-              success = false
-              errorMessage = 'No valid data object found in msg.payload'
-            }
+            if (!data.data) errorMessage = 'No valid data object found in msg.payload'
 
             if (data.data) {
-              if (!data.data.isActive) {
-                success = false
-                errorMessage = 'Please provide an "isActive" property'
-              }
-
-              if (!data.data.key) {
-                success = false
-                errorMessage = 'Please provide a "key" property'
-              }
+              if (!data.data.isActive) errorMessage = 'Please provide an "isActive" property'
+              if (!data.data.key) errorMessage = 'Please provide a "key" property'
             }
-
             break
           case '6': // Update Keyword Record
           case '7': // Delete Keyword Record
-            if (!recordId) {
-              success = false
-              errorMessage = 'Please provide a Record Id'
-            }
+            if (!recordId) errorMessage = 'Please provide a Record Id'
             break
           case '8': // Set Values By Profille Key
-            if (!profileKey) {
-              success = false
-              errorMessage = 'Please provide a Profile Key'
-            }
+            if (!profileKey) errorMessage = 'Please provide a Profile Key'
             break
           case '9': // Set Value By Label
           case '10': // Set Value By Label
             if (!profileKey) {
-              success = false
               errorMessage = 'Please provide a Record Id'
             } else if (!valueKey) {
-              success = false
               errorMessage = 'Please provide a Value Key'
             } else if (!labelKey) {
-              success = false
               errorMessage = 'Please provide a Label Key'
             }
             break
@@ -191,23 +153,17 @@ module.exports = (RED) => {
         }
       }
 
-      if (!success) {
+      if (errorMessage) {
         msg.payload = errorMessage
 
         if (failFlow) {
-          node.error(msg.payload)
+          return node.error(msg.payload)
         } else {
-          node.send(msg)
+          return node.send(msg)
         }
-        return false
       }
 
-      //  Create New instance of Agilite Module that will be performing requests
-      const agilite = new Agilite({
-        apiServerUrl: url,
-        apiKey
-      })
-      let response = null
+      agilite = new Agilite({ apiServerUrl: url, apiKey })
 
       // Mustache
       if (recordId) recordId = Mustache.render(recordId, msg)
@@ -257,12 +213,10 @@ module.exports = (RED) => {
             response = await agilite.Keywords.setLabelByValue(profileKey, valueKey, labelKey, logProcessId)
             break
           case '11': // Get Data
-            // TODO: Slim Result needs to be toggled
-            response = 'test'
             response = await agilite.Keywords.getData(profileKeys.split(','), recordIds.split(','), false, logProcessId)
             break
           default:
-            throw new Error({ response: { data: { errorMessage: 'No valid Action Type specified' } } })
+            throw new Error('No valid Action Type specified')
         }
 
         reqSuccess(response)

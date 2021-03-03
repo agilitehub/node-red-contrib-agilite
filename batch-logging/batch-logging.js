@@ -6,10 +6,10 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config)
 
     const node = this
-    let success = true
+    const field = config.field || 'payload'
+    const fieldType = config.fieldType || 'msg'
     let errorMessage = ''
-    this.field = config.field || 'payload'
-    this.fieldType = config.fieldType || 'msg'
+    let result = null
 
     node.status({
       fill: 'blue',
@@ -17,7 +17,7 @@ module.exports = function (RED) {
       shape: 'ring'
     })
 
-    this.on('input', function (msg) {
+    this.on('input', async (msg) => {
       const serverConfig = RED.nodes.getNode(config.server)
       const url = serverConfig.server
       const failFlow = config.failFlow
@@ -34,16 +34,16 @@ module.exports = function (RED) {
       let pageLimit = config.pageLimit
 
       //  Function that is called inside .then of requests
-      const reqSuccess = function (response) {
-        switch (node.fieldType) {
+      const reqSuccess = (response) => {
+        switch (fieldType) {
           case 'msg':
-            RED.util.setMessageProperty(msg, node.field, response.data)
+            RED.util.setMessageProperty(msg, field, response.data)
             break
           case 'flow':
-            node.context().flow.set(node.field, response.data)
+            node.context().flow.set(field, response.data)
             break
           case 'global':
-            node.context().global.set(node.field, response.data)
+            node.context().global.set(field, response.data)
             break
         }
 
@@ -57,17 +57,18 @@ module.exports = function (RED) {
       }
 
       //  Function that is used inside the .catch of requests
-      const reqCatch = function (error) {
+      const reqCatch = (error) => {
         let errorMessage = ''
-        if (error.response && error.response.data) {
-          msg.agilite.message = error.response.data.errorMessage
-          errorMessage = msg.agilite.message
+
+        if (error.response.data.errorMessage) {
+          errorMessage = error.response.data.errorMessage
+        } else if (error.message) {
+          errorMessage = error.message
         } else {
-          msg.agilite.message = 'Unknown Error Occurred'
-          errorMessage = error.stack
+          errorMessage = error
         }
 
-        msg.payload = msg.agilite.message
+        msg.payload = errorMessage
 
         node.status({
           fill: 'red',
@@ -85,75 +86,8 @@ module.exports = function (RED) {
       data = msg.payload
 
       // Check if we need to use a profile key passed to this node
-      if (msg.agilite) {
-        if (msg.agilite.apiKey) {
-          if (msg.agilite.apiKey !== '') {
-            apiKey = msg.agilite.apiKey
-          }
-        }
-
-        if (msg.agilite.logProcessId) {
-          if (msg.agilite.logProcessId !== '') {
-            logProcessId = msg.agilite.logProcessId
-          }
-        }
-
-        if (msg.agilite.batchlogging) {
-          if (msg.agilite.batchlogging.profileKey) {
-            if (msg.agilite.batchlogging.profileKey !== '') {
-              profileKey = msg.agilite.batchlogging.profileKey
-            }
-          }
-
-          if (msg.agilite.batchlogging.processId) {
-            if (msg.agilite.batchlogging.processsId !== '') {
-              processId = msg.agilite.batchlogging.processId
-            }
-          }
-
-          if (msg.agilite.batchlogging.qry) {
-            if (msg.agilite.batchlogging.qry !== '') {
-              qry = msg.agilite.batchlogging.qry
-            }
-          }
-
-          if (msg.agilite.batchlogging.fieldsToReturn) {
-            if (msg.agilite.batchlogging.fieldsToReturn !== '') {
-              fieldsToReturn = msg.agilite.batchlogging.fieldsToReturn
-            }
-          }
-
-          if (msg.agilite.batchlogging.qryOptions) {
-            if (msg.agilite.batchlogging.qryOptions !== '') {
-              qryOptions = msg.agilite.batchlogging.qryOptions
-            }
-          }
-
-          if (msg.agilite.batchlogging.page) {
-            if (msg.agilite.batchlogging.page !== '') {
-              page = msg.agilite.batchlogging.page
-            }
-          }
-
-          if (msg.agilite.batchlogging.pageLimit) {
-            if (msg.agilite.batchlogging.pageLimit !== '') {
-              pageLimit = msg.agilite.batchlogging.pageLimit
-            }
-          }
-        }
-      }
-
-      if (apiKey === '') {
-        apiKey = serverConfig.credentials.apiKey
-      }
-
-      if (profileKey === '') {
-        profileKey = config.profileKey
-      }
-
-      if (processId === '') {
-        processId = config.processId
-      }
+      if (msg.agilite) if (msg.agilite.logProcessId) logProcessId = msg.agilite.logProcessId
+      if (!apiKey) apiKey = serverConfig.credentials.apiKey
 
       // Mustache
       profileKey = Mustache.render(profileKey, msg)
@@ -165,34 +99,25 @@ module.exports = function (RED) {
       pageLimit = Mustache.render(pageLimit, msg)
 
       // We need a token, keys and data to proceed
-      if (apiKey === '') {
-        success = false
+      if (!apiKey) {
         errorMessage = 'No valid API Key Provided. Please authenticate with Agilit-e first'
-      } else if (url === '') {
-        success = false
+      } else if (!url) {
         errorMessage = 'No Server URL Provided'
       } else {
         switch (config.actionType) {
           case '1': // Init Batch Process
           case '3': // Get By Profile Key
-            if (profileKey === '') {
-              success = false
-              errorMessage = 'No Profile Key found'
-            }
+            if (!profileKey) errorMessage = 'No Profile Key found'
             break
           case '2': // Complete Log Process
           case '4': // Create Log Entry
           case '5': // Generate Log Process Report
-            if (processId === '') {
-              success = false
-              errorMessage = 'No Process Id found'
-            }
-
+            if (!processId) errorMessage = 'No Process Id found'
             break
         }
       }
 
-      if (!success) {
+      if (errorMessage) {
         msg.payload = errorMessage
 
         if (failFlow) {
@@ -203,16 +128,7 @@ module.exports = function (RED) {
         return false
       }
 
-      //  Create New instance of Agilite Module that will be performing requests
-      agilite = new Agilite({
-        apiServerUrl: url,
-        apiKey
-      })
-
-      // Create msg.agilite if it's null so we can store the result
-      if (!msg.agilite) {
-        msg.agilite = {}
-      }
+      agilite = new Agilite({ apiServerUrl: url, apiKey })
 
       node.status({
         fill: 'yellow',
@@ -220,35 +136,30 @@ module.exports = function (RED) {
         shape: 'ring'
       })
 
-      switch (config.actionType) {
-        case '1':
-          agilite.BatchLogging.initLogProcess(profileKey, data, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '2':
-          agilite.BatchLogging.completeLogProcess(processId, data)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '3':
-          agilite.BatchLogging.getByProfileKey(profileKey, logProcessId)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '4':
-          agilite.BatchLogging.createLogEntry(processId, data)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        case '5':
-          agilite.BatchLogging.generateLogProcessReport(processId, qry, fieldsToReturn, qryOptions, page, pageLimit)
-            .then(reqSuccess)
-            .catch(reqCatch)
-          break
-        default:
-          reqCatch({ response: { data: { errorMessage: 'No valid Action Type specified' } } })
-          break
+      try {
+        switch (config.actionType) {
+          case '1':
+            result = await agilite.BatchLogging.initLogProcess(profileKey, data, logProcessId)
+            break
+          case '2':
+            result = await agilite.BatchLogging.completeLogProcess(processId, data)
+            break
+          case '3':
+            result = await agilite.BatchLogging.getByProfileKey(profileKey, logProcessId)
+            break
+          case '4':
+            result = await agilite.BatchLogging.createLogEntry(processId, data)
+            break
+          case '5':
+            result = await agilite.BatchLogging.generateLogProcessReport(processId, qry, fieldsToReturn, qryOptions, page, pageLimit)
+            break
+          default:
+            throw new Error('No valid Action Type specified')
+        }
+
+        reqSuccess(result)
+      } catch (error) {
+        reqCatch(error)
       }
     })
   }
