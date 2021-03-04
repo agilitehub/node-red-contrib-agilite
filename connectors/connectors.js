@@ -57,7 +57,7 @@ module.exports = function (RED) {
       const reqCatch = (error) => {
         let errorMessage = ''
 
-        if (error.response.data.errorMessage) {
+        if (error.response && error.response.data.errorMessage) {
           errorMessage = error.response.data.errorMessage
         } else if (error.message) {
           errorMessage = error.message
