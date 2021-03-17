@@ -29,7 +29,7 @@ module.exports = function (RED) {
       let agilite = null
       const includeKeywords = config.includeKeywords
       let apiKey = ''
-      let logProcessId = ''
+      let logProcessKey = ''
       let profileKey = config.profileKey
       let currentUser = config.currentUser
       let currentStep = config.currentStep
@@ -106,7 +106,7 @@ module.exports = function (RED) {
       data = msg.payload
 
       // Check if we need to use programmatic values
-      if (msg.agilite) if (msg.agilite.logProcessId) logProcessId = msg.agilite.logProcessId
+      if (msg.agilite) if (msg.agilite.logProcessKey) logProcessKey = msg.agilite.logProcessKey
       if (!apiKey) apiKey = serverConfig.credentials.apiKey
 
       // We need a apiKey, key and data to proceed
@@ -216,34 +216,34 @@ module.exports = function (RED) {
       try {
         switch (config.actionType) {
           case '1': // Register BPM Record
-            result = await agilite.BPM.registerBPMRecord(profileKey, currentUser, history, stepOptions, visibleObjects, includeKeywords, isoLanguage, logProcessId)
+            result = await agilite.BPM.registerBPMRecord(profileKey, currentUser, history, stepOptions, visibleObjects, includeKeywords, isoLanguage, logProcessKey)
             break
           case '2': // Execute
-            result = await agilite.BPM.execute(profileKey, bpmRecordId, optionSelected, currentUser, currentStep, comments, data, history, stepOptions, visibleObjects, includeKeywords, isoLanguage, logProcessId)
+            result = await agilite.BPM.execute(profileKey, bpmRecordId, optionSelected, currentUser, currentStep, comments, data, history, stepOptions, visibleObjects, includeKeywords, isoLanguage, logProcessKey)
             break
           case '3': // Get Record State
-            result = await agilite.BPM.getRecordState(profileKeys, bpmRecordIds, stepNames, responsibleUsers, relevantUsers, relevantRoles, eventStamps, eventStartDate, eventEndDate, history, stepOptions, visibleObjects, includeKeywords, page, pageLimit, sort, isoLanguage, logProcessId)
+            result = await agilite.BPM.getRecordState(profileKeys, bpmRecordIds, stepNames, responsibleUsers, relevantUsers, relevantRoles, eventStamps, eventStartDate, eventEndDate, history, stepOptions, visibleObjects, includeKeywords, page, pageLimit, sort, isoLanguage, logProcessKey)
             break
           case '4': // Get By Profile Key
-            result = await agilite.BPM.getByProfileKey(profileKey, logProcessId)
+            result = await agilite.BPM.getByProfileKey(profileKey, logProcessKey)
             break
           case '5': // Get Active Steps
-            result = await agilite.BPM.getActiveSteps(profileKey, isoLanguage, logProcessId)
+            result = await agilite.BPM.getActiveSteps(profileKey, isoLanguage, logProcessKey)
             break
           case '6': // Get Active Users
-            result = await agilite.BPM.getActiveUsers(profileKey, logProcessId)
+            result = await agilite.BPM.getActiveUsers(profileKey, logProcessKey)
             break
           case '7': // Assign Role
-            result = await agilite.BPM.assignRole(profileKey, bpmRecordId, roleNames[0], currentUser, responsibleUsers, logProcessId)
+            result = await agilite.BPM.assignRole(profileKey, bpmRecordId, roleNames[0], currentUser, responsibleUsers, logProcessKey)
             break
           case '8': // Get Assigned Roles
-            result = await agilite.BPM.getAssignedRoles(profileKey, bpmRecordId, roleNames, logProcessId)
+            result = await agilite.BPM.getAssignedRoles(profileKey, bpmRecordId, roleNames, logProcessKey)
             break
           case '9': // Lock Record
-            result = await agilite.BPM.lockRecord(bpmRecordId, logProcessId)
+            result = await agilite.BPM.lockRecord(bpmRecordId, logProcessKey)
             break
           case '10': // Unlock Record
-            result = await agilite.BPM.unlockRecord(bpmRecordId, logProcessId)
+            result = await agilite.BPM.unlockRecord(bpmRecordId, logProcessKey)
             break
           default:
             throw new Error('No valid Action Type specified')

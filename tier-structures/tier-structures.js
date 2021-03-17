@@ -22,7 +22,7 @@ module.exports = function (RED) {
       const serverConfig = RED.nodes.getNode(config.server)
       let agilite = null
       let apiKey = ''
-      let logProcessId = ''
+      let logProcessKey = ''
       let tierKeys = config.tierKeys
       let sortValues = config.sortValues
       let valuesOutputFormat = config.valuesOutputFormat
@@ -86,7 +86,7 @@ module.exports = function (RED) {
       if (TypeDetect(msg.payload) !== 'Object') msg.payload = {}
 
       // Check if we need to use programmatic values
-      if (msg.agilite) if (msg.agilite.logProcessId) logProcessId = msg.agilite.logProcessId
+      if (msg.agilite) if (msg.agilite.logProcessKey) logProcessKey = msg.agilite.logProcessKey
       if (!apiKey) apiKey = serverConfig.credentials.apiKey
 
       // We need a apiKey, key and data to proceed
@@ -132,7 +132,7 @@ module.exports = function (RED) {
       try {
         switch (config.actionType) {
           case '1': // getTierByKey
-            result = await agilite.TierStructures.getTierByKey(tierKeys, includeValues, includeMetaData, includeTierEntries, sortValues, valuesOutputFormat, logProcessId)
+            result = await agilite.TierStructures.getTierByKey(tierKeys, includeValues, includeMetaData, includeTierEntries, sortValues, valuesOutputFormat, logProcessKey)
             break
         }
 

@@ -23,7 +23,7 @@ module.exports = function (RED) {
       const url = serverConfig.server
       const failFlow = config.failFlow
       let apiKey = ''
-      let logProcessId = ''
+      let logProcessKey = ''
       let data = {}
       let agilite = null
       let profileKey = config.profileKey
@@ -78,7 +78,7 @@ module.exports = function (RED) {
         }
       }
 
-      if (msg.agilite) if (msg.agilite.logProcessId) logProcessId = msg.agilite.logProcessId
+      if (msg.agilite) if (msg.agilite.logProcessKey) logProcessKey = msg.agilite.logProcessKey
 
       // Check if there's valid data to pass
       if (TypeDetect(msg.payload) !== 'Object') msg.payload = {}
@@ -121,7 +121,7 @@ module.exports = function (RED) {
       })
 
       try {
-        result = await agilite.Numbering.generate(profileKey, null, data, logProcessId)
+        result = await agilite.Numbering.generate(profileKey, null, data, logProcessKey)
         reqSuccess(result)
       } catch (error) {
         reqCatch(error)

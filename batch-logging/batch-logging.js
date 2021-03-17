@@ -24,7 +24,7 @@ module.exports = function (RED) {
       let agilite = null
       let apiKey = ''
       let data = null
-      let logProcessId = null
+      let logProcessKey = null
       let profileKey = config.profileKey
       let processId = config.processId
       let qry = config.qry
@@ -86,7 +86,7 @@ module.exports = function (RED) {
       data = msg.payload
 
       // Check if we need to use a profile key passed to this node
-      if (msg.agilite) if (msg.agilite.logProcessId) logProcessId = msg.agilite.logProcessId
+      if (msg.agilite) if (msg.agilite.logProcessKey) logProcessKey = msg.agilite.logProcessKey
       if (!apiKey) apiKey = serverConfig.credentials.apiKey
 
       // Mustache
@@ -139,13 +139,13 @@ module.exports = function (RED) {
       try {
         switch (config.actionType) {
           case '1':
-            result = await agilite.BatchLogging.initLogProcess(profileKey, data, logProcessId)
+            result = await agilite.BatchLogging.initLogProcess(profileKey, data, logProcessKey)
             break
           case '2':
             result = await agilite.BatchLogging.completeLogProcess(processId, data)
             break
           case '3':
-            result = await agilite.BatchLogging.getByProfileKey(profileKey, logProcessId)
+            result = await agilite.BatchLogging.getByProfileKey(profileKey, logProcessKey)
             break
           case '4':
             result = await agilite.BatchLogging.createLogEntry(processId, data)

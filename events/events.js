@@ -25,7 +25,7 @@ module.exports = function (RED) {
       const url = serverConfig.server
       const failFlow = config.failFlow
       let apiKey = ''
-      let logProcessId = ''
+      let logProcessKey = ''
       let data = null
 
       //  Function that is called inside .then of requests
@@ -83,7 +83,7 @@ module.exports = function (RED) {
       data = msg.payload
 
       // Check if we need to use a profile key passed to this node
-      if (msg.agilite) if (msg.agilite.logProcessId) logProcessId = msg.agilite.logProcessId
+      if (msg.agilite) if (msg.agilite.logProcessKey) logProcessKey = msg.agilite.logProcessKey
       if (!apiKey) apiKey = serverConfig.credentials.apiKey
       if (profileKey) profileKey = config.profileKey
 
@@ -126,10 +126,10 @@ module.exports = function (RED) {
       try {
         switch (config.actionType) {
           case '1':
-            result = await agilite.Events.execute(profileKey, data, logProcessId)
+            result = await agilite.Events.execute(profileKey, data, logProcessKey)
             break
           case '2':
-            result = await agilite.Events.subscribe(profileKey, data, logProcessId)
+            result = await agilite.Events.subscribe(profileKey, data, logProcessKey)
             break
           default:
             throw new Error('No valid Action Type specified')

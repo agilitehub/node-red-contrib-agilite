@@ -23,7 +23,7 @@ module.exports = function (RED) {
       let agilite = null
       const payloadFile = config.payloadFile
       let apiKey = ''
-      let logProcessId = null
+      let logProcessKey = null
       let profileKey = config.profileKey
       let routeKey = config.routeKey
       let data = null
@@ -85,7 +85,7 @@ module.exports = function (RED) {
       data = msg.payload
 
       // Check if we need to use a profile and route key passed to this node
-      if (msg.agilite) if (msg.agilite.logProcessId) logProcessId = msg.agilite.logProcessId
+      if (msg.agilite) if (msg.agilite.logProcessKey) logProcessKey = msg.agilite.logProcessKey
       if (!apiKey) apiKey = serverConfig.credentials.apiKey
 
       // Mustache
@@ -122,7 +122,7 @@ module.exports = function (RED) {
       })
 
       try {
-        result = await agilite.Connectors.execute(profileKey, routeKey, data, payloadFile, logProcessId)
+        result = await agilite.Connectors.execute(profileKey, routeKey, data, payloadFile, logProcessKey)
         reqSuccess(result)
       } catch (error) {
         reqCatch(error)
