@@ -26,7 +26,7 @@ module.exports = function (RED) {
       let roleName = config.roleName
       let conditionalLevels = config.conditionalLevels
       let apiKey = ''
-      let logProcessKey = ''
+      let logProfileKey = ''
       let data = {}
 
       //  Function that is called inside .then of requests
@@ -84,7 +84,7 @@ module.exports = function (RED) {
       data = msg.payload
 
       // Check if we need to use programmatic values
-      if (msg.agilite) if (msg.agilite.logProcessKey) logProcessKey = msg.agilite.logProcessKey
+      if (msg.agilite) if (msg.agilite.logProfileKey) logProfileKey = msg.agilite.logProfileKey
       if (!apiKey) apiKey = serverConfig.credentials.apiKey
       if (roleName) roleName = config.roleName
 
@@ -133,7 +133,7 @@ module.exports = function (RED) {
       try {
         switch (config.actionType) {
           case '1': // Get Role
-            result = await agilite.Roles.getRole(roleName, conditionalLevels, data, logProcessKey)
+            result = await agilite.Roles.getRole(roleName, conditionalLevels, data, logProfileKey)
             break
           default:
             throw new Error('No valid Action Type specified')

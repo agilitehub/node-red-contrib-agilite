@@ -27,7 +27,7 @@ module.exports = function (RED) {
       const failFlow = config.failFlow
       const data = msg.payload
       let apiKey = ''
-      let logProcessKey = ''
+      let logProfileKey = ''
       let fileName = config.fileName
       let contentType = config.contentType
       let responseType = ''
@@ -88,7 +88,7 @@ module.exports = function (RED) {
       }
 
       // Check if we need to use programmatic values
-      if (msg.agilite) if (msg.agilite.logProcessKey) logProcessKey = msg.agilite.logProcessKey
+      if (msg.agilite) if (msg.agilite.logProfileKey) logProfileKey = msg.agilite.logProfileKey
       if (!apiKey) apiKey = serverConfig.credentials.apiKey
 
       if (config.responseType) {
@@ -146,19 +146,19 @@ module.exports = function (RED) {
       try {
         switch (config.actionType) {
           case '1': // Get File
-            result = await agilite.Files.getFile(recordId, responseType, logProcessKey)
+            result = await agilite.Files.getFile(recordId, responseType, logProfileKey)
             break
           case '2': // Get File Name
-            result = await agilite.Files.getFileName(recordId, logProcessKey)
+            result = await agilite.Files.getFileName(recordId, logProfileKey)
             break
           case '3': // Delete File
-            result = await agilite.Files.deleteFile(recordId, logProcessKey)
+            result = await agilite.Files.deleteFile(recordId, logProfileKey)
             break
           case '4': // Post File
-            result = await agilite.Files.uploadFile(fileName, contentType, data, persistFile, isPublic, logProcessKey)
+            result = await agilite.Files.uploadFile(fileName, contentType, data, persistFile, isPublic, logProfileKey)
             break
           case '5': // Unzip File
-            result = await agilite.Files.unzip(recordId, logProcessKey)
+            result = await agilite.Files.unzip(recordId, logProfileKey)
             break
           default:
             throw new Error('No valid Action Type specified')

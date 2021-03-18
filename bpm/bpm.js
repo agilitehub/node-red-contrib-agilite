@@ -29,7 +29,7 @@ module.exports = function (RED) {
       let agilite = null
       const includeKeywords = config.includeKeywords
       let apiKey = ''
-      let logProcessKey = ''
+      let logProfileKey = ''
       let profileKey = config.profileKey
       let currentUser = config.currentUser
       let currentStep = config.currentStep
@@ -106,7 +106,7 @@ module.exports = function (RED) {
       data = msg.payload
 
       // Check if we need to use programmatic values
-      if (msg.agilite) if (msg.agilite.logProcessKey) logProcessKey = msg.agilite.logProcessKey
+      if (msg.agilite) if (msg.agilite.logProfileKey) logProfileKey = msg.agilite.logProfileKey
       if (!apiKey) apiKey = serverConfig.credentials.apiKey
 
       // We need a apiKey, key and data to proceed
@@ -216,34 +216,34 @@ module.exports = function (RED) {
       try {
         switch (config.actionType) {
           case '1': // Register BPM Record
-            result = await agilite.BPM.registerBPMRecord(profileKey, currentUser, history, stepOptions, visibleObjects, includeKeywords, isoLanguage, logProcessKey)
+            result = await agilite.BPM.registerBPMRecord(profileKey, currentUser, history, stepOptions, visibleObjects, includeKeywords, isoLanguage, logProfileKey)
             break
           case '2': // Execute
-            result = await agilite.BPM.execute(profileKey, bpmRecordId, optionSelected, currentUser, currentStep, comments, data, history, stepOptions, visibleObjects, includeKeywords, isoLanguage, logProcessKey)
+            result = await agilite.BPM.execute(profileKey, bpmRecordId, optionSelected, currentUser, currentStep, comments, data, history, stepOptions, visibleObjects, includeKeywords, isoLanguage, logProfileKey)
             break
           case '3': // Get Record State
-            result = await agilite.BPM.getRecordState(profileKeys, bpmRecordIds, stepNames, responsibleUsers, relevantUsers, relevantRoles, eventStamps, eventStartDate, eventEndDate, history, stepOptions, visibleObjects, includeKeywords, page, pageLimit, sort, isoLanguage, logProcessKey)
+            result = await agilite.BPM.getRecordState(profileKeys, bpmRecordIds, stepNames, responsibleUsers, relevantUsers, relevantRoles, eventStamps, eventStartDate, eventEndDate, history, stepOptions, visibleObjects, includeKeywords, page, pageLimit, sort, isoLanguage, logProfileKey)
             break
           case '4': // Get By Profile Key
-            result = await agilite.BPM.getByProfileKey(profileKey, logProcessKey)
+            result = await agilite.BPM.getByProfileKey(profileKey, logProfileKey)
             break
           case '5': // Get Active Steps
-            result = await agilite.BPM.getActiveSteps(profileKey, isoLanguage, logProcessKey)
+            result = await agilite.BPM.getActiveSteps(profileKey, isoLanguage, logProfileKey)
             break
           case '6': // Get Active Users
-            result = await agilite.BPM.getActiveUsers(profileKey, logProcessKey)
+            result = await agilite.BPM.getActiveUsers(profileKey, logProfileKey)
             break
           case '7': // Assign Role
-            result = await agilite.BPM.assignRole(profileKey, bpmRecordId, roleNames[0], currentUser, responsibleUsers, logProcessKey)
+            result = await agilite.BPM.assignRole(profileKey, bpmRecordId, roleNames[0], currentUser, responsibleUsers, logProfileKey)
             break
           case '8': // Get Assigned Roles
-            result = await agilite.BPM.getAssignedRoles(profileKey, bpmRecordId, roleNames, logProcessKey)
+            result = await agilite.BPM.getAssignedRoles(profileKey, bpmRecordId, roleNames, logProfileKey)
             break
           case '9': // Lock Record
-            result = await agilite.BPM.lockRecord(bpmRecordId, logProcessKey)
+            result = await agilite.BPM.lockRecord(bpmRecordId, logProfileKey)
             break
           case '10': // Unlock Record
-            result = await agilite.BPM.unlockRecord(bpmRecordId, logProcessKey)
+            result = await agilite.BPM.unlockRecord(bpmRecordId, logProfileKey)
             break
           default:
             throw new Error('No valid Action Type specified')

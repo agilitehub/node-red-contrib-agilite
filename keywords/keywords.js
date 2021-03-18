@@ -27,7 +27,7 @@ module.exports = function (RED) {
       const url = serverConfig.server
       const failFlow = config.failFlow
       let apiKey = ''
-      let logProcessKey = ''
+      let logProfileKey = ''
       let profileKey = config.profileKey
       let recordId = config.recordId
       let groupName = config.groupName
@@ -88,7 +88,7 @@ module.exports = function (RED) {
         }
       }
 
-      if (msg.agilite) if (msg.agilite.logProcessKey) logProcessKey = msg.agilite.logProcessKey
+      if (msg.agilite) if (msg.agilite.logProfileKey) logProfileKey = msg.agilite.logProfileKey
 
       // Check if there's valid data to pass
       if (TypeDetect(msg.payload) !== 'Object' && TypeDetect(msg.payload) !== 'Array') msg.payload = {}
@@ -183,37 +183,37 @@ module.exports = function (RED) {
       try {
         switch (config.actionType) {
           case '1': // Get Values By Profile Key
-            response = await agilite.Keywords.getValuesByProfileKey(profileKey, sortBy, outputFormat, logProcessKey)
+            response = await agilite.Keywords.getValuesByProfileKey(profileKey, sortBy, outputFormat, logProfileKey)
             break
           case '2': // Get Profile Keys By Group
-            response = await agilite.Keywords.getProfileKeysByGroup(groupName, sortBy2, logProcessKey)
+            response = await agilite.Keywords.getProfileKeysByGroup(groupName, sortBy2, logProfileKey)
             break
           case '3': // Get Keyword Value by Label
-            response = await agilite.Keywords.getValueByLabel(profileKey, labelKey, outputFormat2, logProcessKey)
+            response = await agilite.Keywords.getValueByLabel(profileKey, labelKey, outputFormat2, logProfileKey)
             break
           case '4': // Get Keyword Label by Value
-            response = await agilite.Keywords.getLabelByValue(profileKey, valueKey, outputFormat2, logProcessKey)
+            response = await agilite.Keywords.getLabelByValue(profileKey, valueKey, outputFormat2, logProfileKey)
             break
           case '5': // Create Keyword Record
-            response = await agilite.Keywords.postData(data, logProcessKey)
+            response = await agilite.Keywords.postData(data, logProfileKey)
             break
           case '6': // Update Keyword Record
-            response = await agilite.Keywords.putData(recordId, data, logProcessKey)
+            response = await agilite.Keywords.putData(recordId, data, logProfileKey)
             break
           case '7': // Delete Keyword Record
-            response = await agilite.Keywords.deleteData(recordId, logProcessKey)
+            response = await agilite.Keywords.deleteData(recordId, logProfileKey)
             break
           case '8': // Set Values By Profile Key
-            response = await agilite.Keywords.setValuesByProfileKey(profileKey, data, logProcessKey)
+            response = await agilite.Keywords.setValuesByProfileKey(profileKey, data, logProfileKey)
             break
           case '9': // Set Value By Label
-            response = await agilite.Keywords.setValueByLabel(profileKey, labelKey, valueKey, logProcessKey)
+            response = await agilite.Keywords.setValueByLabel(profileKey, labelKey, valueKey, logProfileKey)
             break
           case '10': // Set Label By Value
-            response = await agilite.Keywords.setLabelByValue(profileKey, valueKey, labelKey, logProcessKey)
+            response = await agilite.Keywords.setLabelByValue(profileKey, valueKey, labelKey, logProfileKey)
             break
           case '11': // Get Data
-            response = await agilite.Keywords.getData(profileKeys.split(','), recordIds.split(','), false, logProcessKey)
+            response = await agilite.Keywords.getData(profileKeys.split(','), recordIds.split(','), false, logProfileKey)
             break
           default:
             throw new Error('No valid Action Type specified')

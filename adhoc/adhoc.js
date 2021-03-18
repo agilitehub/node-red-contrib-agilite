@@ -25,7 +25,7 @@ module.exports = function (RED) {
       const fullName = config.fullName
       let agilite = null
       let apiKey = ''
-      let logProcessKey = ''
+      let logProfileKey = ''
       let dateTimeValue = config.dateTimeValue
       let formatKey = config.formatKey
       let recordId = config.recordId
@@ -116,7 +116,7 @@ module.exports = function (RED) {
       data = msg.payload
 
       // Check if we need to use programmatic values
-      if (msg.agilite) if (msg.agilite.logProcessKey) logProcessKey = msg.agilite.logProcessKey
+      if (msg.agilite) if (msg.agilite.logProfileKey) logProfileKey = msg.agilite.logProfileKey
       if (!apiKey) apiKey = serverConfig.credentials.apiKey
 
       // We need a token, key and data to proceed
@@ -183,16 +183,16 @@ module.exports = function (RED) {
       try {
         switch (config.actionType) {
           case '10': // Generate Username
-            result = await agilite.Utils.generateUsername(fullName, data, logProcessKey)
+            result = await agilite.Utils.generateUsername(fullName, data, logProfileKey)
             break
           case '11': // Generate OCR
-            result = await agilite.Utils.generateOCR(recordId, logProcessKey)
+            result = await agilite.Utils.generateOCR(recordId, logProfileKey)
             break
           case '12': // Authenticate Token
             result = await agilite.authenticateToken(apiKeyValue)
             break
           default:
-            result = await agilite.Utils[action](action !== 'formatDateTime' ? data : dateTimeValue, formatKey, logProcessKey)
+            result = await agilite.Utils[action](action !== 'formatDateTime' ? data : dateTimeValue, formatKey, logProfileKey)
         }
 
         reqSuccess(result)

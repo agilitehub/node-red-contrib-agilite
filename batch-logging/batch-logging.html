@@ -4,7 +4,7 @@
         var value = $("#node-input-actionType option:selected").val();
 
         switch(value){
-          case "1": // Init Log Process
+          case "1": // Get By Profile Key
             document.querySelector("#rowProfileKey").style.display = "block";
             document.querySelector("#rowProcessId").style.display = "none";
             document.querySelector("#rowQry").style.display = "none";
@@ -13,7 +13,7 @@
             document.querySelector("#rowPage").style.display = "none";
             document.querySelector("#rowPageLimit").style.display = "none";
             break;
-          case "2": // Complete Log Process
+          case "2": // Create Log Entry
             document.querySelector("#rowProfileKey").style.display = "none";
             document.querySelector("#rowProcessId").style.display = "block";
             document.querySelector("#rowQry").style.display = "none";
@@ -22,25 +22,7 @@
             document.querySelector("#rowPage").style.display = "none";
             document.querySelector("#rowPageLimit").style.display = "none";
             break;
-          case "3": // Get By Profile Key
-            document.querySelector("#rowProfileKey").style.display = "block";
-            document.querySelector("#rowProcessId").style.display = "none";
-            document.querySelector("#rowQry").style.display = "none";
-            document.querySelector("#rowFieldsToReturn").style.display = "none";
-            document.querySelector("#rowQryOptions").style.display = "none";
-            document.querySelector("#rowPage").style.display = "none";
-            document.querySelector("#rowPageLimit").style.display = "none";
-            break;
-          case "4": // Create Log Entry
-            document.querySelector("#rowProfileKey").style.display = "none";
-            document.querySelector("#rowProcessId").style.display = "block";
-            document.querySelector("#rowQry").style.display = "none";
-            document.querySelector("#rowFieldsToReturn").style.display = "none";
-            document.querySelector("#rowQryOptions").style.display = "none";
-            document.querySelector("#rowPage").style.display = "none";
-            document.querySelector("#rowPageLimit").style.display = "none";
-            break;
-          case "5": // Generate Log Processs Report
+          case "3": // Generate Log Processs Report
             document.querySelector("#rowProfileKey").style.display = "none";
             document.querySelector("#rowProcessId").style.display = "block";
             document.querySelector("#rowQry").style.display = "block";
@@ -140,11 +122,9 @@
   <div class="form-row" id="rowActionType">
     <label for="node-input-actionType"><i class="fa fa-arrow-circle-right"></i> Action Type</label>
     <select id="node-input-actionType" style="width:auto;">
-      <option value="1">Init Log Process</option>
-      <option value="2">Complete Log Process</option>
-      <option value="3">Get By Profile Key</option>
-      <option value="4">Create Log Entry</option>
-      <option value="5">Generate Log Processs Report</option>
+      <option value="1">Get By Profile Key</option>
+      <option value="2">Create Log Entry</option>
+      <option value="3">Generate Log Processs Report</option>
     </select>
   </div>
   <div class="form-row" id="rowProfileKey">

@@ -24,7 +24,7 @@ module.exports = function (RED) {
       let agilite = null
       let apiKey = ''
       let data = null
-      let logProcessKey = null
+      let logProfileKey = null
       let profileKey = config.profileKey
       let processId = config.processId
       let qry = config.qry
@@ -86,7 +86,7 @@ module.exports = function (RED) {
       data = msg.payload
 
       // Check if we need to use a profile key passed to this node
-      if (msg.agilite) if (msg.agilite.logProcessKey) logProcessKey = msg.agilite.logProcessKey
+      if (msg.agilite) if (msg.agilite.logProfileKey) logProfileKey = msg.agilite.logProfileKey
       if (!apiKey) apiKey = serverConfig.credentials.apiKey
 
       // Mustache
@@ -105,13 +105,11 @@ module.exports = function (RED) {
         errorMessage = 'No Server URL Provided'
       } else {
         switch (config.actionType) {
-          case '1': // Init Batch Process
-          case '3': // Get By Profile Key
+          case '1': // Get By Profile Key
             if (!profileKey) errorMessage = 'No Profile Key found'
             break
-          case '2': // Complete Log Process
-          case '4': // Create Log Entry
-          case '5': // Generate Log Process Report
+          case '2': // Create Log Entry
+          case '3': // Generate Log Process Report
             if (!processId) errorMessage = 'No Process Id found'
             break
         }
@@ -139,18 +137,12 @@ module.exports = function (RED) {
       try {
         switch (config.actionType) {
           case '1':
-            result = await agilite.BatchLogging.initLogProcess(profileKey, data, logProcessKey)
+            result = await agilite.BatchLogging.getByProfileKey(profileKey, logProfileKey)
             break
           case '2':
-            result = await agilite.BatchLogging.completeLogProcess(processId, data)
-            break
-          case '3':
-            result = await agilite.BatchLogging.getByProfileKey(profileKey, logProcessKey)
-            break
-          case '4':
             result = await agilite.BatchLogging.createLogEntry(processId, data)
             break
-          case '5':
+          case '3':
             result = await agilite.BatchLogging.generateLogProcessReport(processId, qry, fieldsToReturn, qryOptions, page, pageLimit)
             break
           default:

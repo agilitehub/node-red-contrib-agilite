@@ -25,7 +25,7 @@ module.exports = function (RED) {
       const url = serverConfig.server
       const failFlow = config.failFlow
       let apiKey = ''
-      let logProcessKey = ''
+      let logProfileKey = ''
       let data = {}
 
       //  Function that is called inside .then of requests
@@ -86,7 +86,7 @@ module.exports = function (RED) {
       data = msg.payload
 
       // Check if we need to use programmatic values
-      if (msg.agilite) if (msg.agilite.logProcessKey) logProcessKey = msg.agilite.logProcessKey
+      if (msg.agilite) if (msg.agilite.logProfileKey) logProfileKey = msg.agilite.logProfileKey
       if (!apiKey) apiKey = serverConfig.credentials.apiKey
 
       // Mustache
@@ -121,7 +121,7 @@ module.exports = function (RED) {
       })
 
       try {
-        result = await agilite.Templates.execute(profileKey, data, logProcessKey)
+        result = await agilite.Templates.execute(profileKey, data, logProfileKey)
         reqSuccess(result)
       } catch (error) {
         reqCatch(error)
