@@ -24,9 +24,8 @@ module.exports = function (RED) {
       let agilite = null
       let apiKey = ''
       let data = null
-      let logProfileKey = null
       let profileKey = config.profileKey
-      let processId = config.processId
+      let logProfileKey = config.logProfileKey
       let qry = config.qry
       let fieldsToReturn = config.fieldsToReturn
       let qryOptions = config.qryOptions
@@ -91,7 +90,7 @@ module.exports = function (RED) {
 
       // Mustache
       profileKey = Mustache.render(profileKey, msg)
-      processId = Mustache.render(processId, msg)
+      logProfileKey = Mustache.render(logProfileKey, msg)
       qry = Mustache.render(qry, msg)
       fieldsToReturn = Mustache.render(fieldsToReturn, msg)
       qryOptions = Mustache.render(qryOptions, msg)
@@ -110,7 +109,7 @@ module.exports = function (RED) {
             break
           case '2': // Create Log Entry
           case '3': // Generate Log Process Report
-            if (!processId) errorMessage = 'No Process Id found'
+            if (!logProfileKey) errorMessage = 'No Log Profile Key found'
             break
         }
       }
@@ -140,10 +139,10 @@ module.exports = function (RED) {
             result = await agilite.BatchLogging.getByProfileKey(profileKey, logProfileKey)
             break
           case '2':
-            result = await agilite.BatchLogging.createLogEntry(processId, data)
+            result = await agilite.BatchLogging.createLogEntry(logProfileKey, data)
             break
           case '3':
-            result = await agilite.BatchLogging.generateLogProcessReport(processId, qry, fieldsToReturn, qryOptions, page, pageLimit)
+            result = await agilite.BatchLogging.generateLogProcessReport(logProfileKey, qry, fieldsToReturn, qryOptions, page, pageLimit)
             break
           default:
             throw new Error('No valid Action Type specified')
